@@ -28,81 +28,191 @@
   <!-- ── 3D WebGL Canvas ─────────────────────────────────── -->
   <canvas id="game-canvas"></canvas>
 
-  <!-- ── Global Menu Header (Level, XP, Credits, Materials, Network, Version) ── -->
-  <div id="menu-header">
+  <!-- ── Global Menu Header (Pilot, Season, Currencies, Settings) ── -->
+  <div id="menu-header" class="ma-top-header">
     <div class="header-left">
-      <div class="pilot-badge">
-        <span class="pilot-title" id="menu-pilot-title">PILOT</span>
-        <span class="pilot-level" id="menu-level-val">1</span>
-      </div>
-      <div class="pilot-xp-wrap">
-        <div class="pilot-xp-bar"><div id="menu-xp-progress" style="width: 0%;"></div></div>
-        <span class="pilot-xp-text" id="menu-xp-text">0 / 800 XP</span>
+      <div class="pilot-profile-card" id="btn-header-profile">
+        <div class="pilot-avatar-frame">
+          <span class="pilot-avatar-icon">🧑‍🚀</span>
+          <span class="pilot-rank-badge" id="menu-level-val">1</span>
+        </div>
+        <div class="pilot-meta">
+          <div class="pilot-name-row">
+            <span class="pilot-title" id="menu-pilot-title">COMMANDER</span>
+            <span class="pilot-trophy-badge">🏆 <span id="menu-trophies-val">2,687</span></span>
+          </div>
+          <div class="pilot-xp-wrap">
+            <div class="pilot-xp-bar"><div id="menu-xp-progress" style="width: 25%;"></div></div>
+            <span class="pilot-xp-text" id="menu-xp-text">200 / 800 XP</span>
+          </div>
+        </div>
       </div>
       <div id="net-status-pill" class="net-status-pill net-online">
         <span class="net-dot"></span> <span id="net-status-text">ONLINE</span> <span class="net-ping" id="net-ping-display">35ms</span>
       </div>
-      <div class="version-tag" id="menu-version-tag">v1.0.0</div>
     </div>
+
+    <!-- Center Season Banner -->
+    <div class="header-center-event">
+      <div class="season-badge-pill">
+        <span class="season-icon">🎖️</span>
+        <div class="season-info">
+          <span class="season-name">SEASON 1 · TITAN SQUAD</span>
+          <span class="season-timer">ENDS IN 1W 5D · <strong class="season-pts">5,995 PTS</strong></span>
+        </div>
+      </div>
+    </div>
+
     <div class="header-right">
-      <div class="currency-badge">
+      <div class="currency-badge curr-mats">
         <span class="curr-icon">🔧</span>
         <span class="curr-val" id="menu-mats-val">50</span>
-        <span class="curr-label">MATS</span>
+        <button class="curr-add-btn" aria-label="Add Mats">+</button>
       </div>
-      <div class="currency-badge">
+      <div class="currency-badge curr-tokens">
         <span class="curr-icon">🪙</span>
         <span class="curr-val" id="menu-tokens-val">5</span>
-        <span class="curr-label">TOKENS</span>
+        <button class="curr-add-btn" aria-label="Add Tokens">+</button>
       </div>
-      <div class="currency-badge">
+      <div class="currency-badge curr-credits">
         <span class="curr-icon">💎</span>
         <span class="curr-val" id="menu-credits-val">1,000</span>
-        <span class="curr-label">CREDITS</span>
+        <button class="curr-add-btn" aria-label="Add Credits">+</button>
       </div>
+      <button class="header-icon-btn" id="btn-menu-settings" title="Settings">⚙️</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════ -->
-  <!-- ── SCREEN 1: MAIN MENU ─────────────────────────────── -->
+  <!-- ── SCREEN 1: MAIN MENU (AAA MECH ARENA LOBBY) ──────── -->
   <!-- ══════════════════════════════════════════════════════ -->
-  <div id="screen-main-menu" class="ui-screen">
-    <div class="main-menu-brand">
-      <h1 class="game-logo">IRON TITANS</h1>
-      <div class="game-tagline">3D TACTICAL MECH ARENA</div>
+  <div id="screen-main-menu" class="ui-screen ma-screen-lobby">
+    <!-- Left Column: Events & Missions & Career -->
+    <div class="lobby-col lobby-left">
+      <div class="lobby-brand-mini">
+        <div class="game-logo-text">IRON TITANS</div>
+        <div class="game-version-pill" id="menu-version-tag">v1.0.0</div>
+      </div>
+
+      <!-- Battle Pass / Season Card -->
+      <div class="lobby-event-card" id="btn-menu-missions">
+        <div class="lec-tag">SEASON PASS</div>
+        <div class="lec-title">TITAN TRIAL</div>
+        <div class="lec-progress-row">
+          <div class="lec-bar"><div class="lec-bar-fill" style="width: 60%;"></div></div>
+          <span class="lec-level">LV. 12</span>
+        </div>
+        <div class="lec-badge">REWARDS READY!</div>
+        <span class="nav-badge" id="badge-missions" style="display: none;">0</span>
+      </div>
+
+      <!-- Daily Reward Tile -->
+      <div class="lobby-quick-card" id="btn-menu-daily">
+        <div class="lqc-icon">🎁</div>
+        <div class="lqc-details">
+          <div class="lqc-title">DAILY CRATE</div>
+          <div class="lqc-sub">READY TO CLAIM</div>
+        </div>
+        <span class="nav-badge ready" id="badge-daily-reward">!</span>
+      </div>
+
+      <!-- Career & Online Pills -->
+      <div class="lobby-side-actions">
+        <button class="lobby-action-pill" id="btn-menu-career">
+          <span class="lap-icon">🏆</span>
+          <span class="lap-text">CAREER STATS</span>
+        </button>
+        <button class="lobby-action-pill" id="btn-menu-play-online">
+          <span class="lap-icon">🌐</span>
+          <span class="lap-text">5v5 MULTIPLAYER</span>
+        </button>
+      </div>
     </div>
 
-    <div class="main-menu-nav">
-      <button class="nav-btn nav-btn-primary" id="btn-menu-play-online">
-        <span class="nav-btn-glow"></span>
-        <span class="nav-btn-text">🌐 PLAY ONLINE (5v5)</span>
-      </button>
-      <button class="nav-btn nav-btn-secondary" id="btn-menu-play">
-        <span class="nav-btn-text">⚔️ BATTLE (OFFLINE)</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-missions">
-        <span class="nav-btn-text">📋 MISSIONS</span>
-        <span class="nav-badge" id="badge-missions" style="display: none;">0</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-daily">
-        <span class="nav-btn-text">🎁 DAILY REWARD</span>
-        <span class="nav-badge ready" id="badge-daily-reward">!</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-garage">
-        <span class="nav-btn-text">🤖 MECH GARAGE</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-weapons">
-        <span class="nav-btn-text">💥 WEAPONS</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-loadout">
-        <span class="nav-btn-text">⚙️ LOADOUT</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-career">
-        <span class="nav-btn-text">🏆 CAREER</span>
-      </button>
-      <button class="nav-btn" id="btn-menu-settings">
-        <span class="nav-btn-text">🔧 SETTINGS</span>
-      </button>
+    <!-- Center Stage: 3D Turntable Indicators & Cycle Arrows -->
+    <div class="lobby-col lobby-center">
+      <!-- Mech Power Rating & Name Floating Tag -->
+      <div class="mech-center-power-badge">
+        <div class="power-mech-name" id="lobby-active-mech-name">IRONCLAD-X1</div>
+        <div class="power-rating-pill">
+          <span class="power-bolt">⚡</span>
+          <span class="power-val" id="lobby-active-mech-power">1,316 POWER</span>
+        </div>
+      </div>
+
+      <!-- Chevrons to cycle mechs directly in the lobby -->
+      <div class="mech-cycle-arrows">
+        <button class="btn-cycle-mech btn-cycle-prev" id="btn-lobby-mech-prev" aria-label="Previous Mech">❮</button>
+        <button class="btn-cycle-mech btn-cycle-next" id="btn-lobby-mech-next" aria-label="Next Mech">❯</button>
+      </div>
+
+      <!-- Bottom Center: Reward Crates -->
+      <div class="lobby-reward-crates">
+        <div class="crate-card" id="crate-star-card">
+          <div class="crate-icon-wrap">⭐</div>
+          <div class="crate-meta">
+            <div class="crate-name">STAR CRATE</div>
+            <div class="crate-progress-bar"><div class="cp-fill" style="width: 40%;"></div></div>
+            <div class="crate-counter">4 / 10 STARS</div>
+          </div>
+        </div>
+        <div class="crate-card ready-glow" id="crate-combat-card">
+          <div class="crate-icon-wrap">📦</div>
+          <div class="crate-meta">
+            <div class="crate-name">COMBAT CRATE</div>
+            <div class="crate-progress-bar"><div class="cp-fill ready" style="width: 95%;"></div></div>
+            <div class="crate-counter">95 / 100 PTS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right & Bottom: Inventory, Shop & Massive BATTLE Button -->
+    <div class="lobby-col lobby-right">
+      <!-- Top Right Squad Loadout pill -->
+      <div class="lobby-squad-select-pill" id="btn-menu-loadout">
+        <span class="ls-label">ACTIVE SQUAD</span>
+        <span class="ls-squad">SQUAD 1 (3/5 MECHS) ▾</span>
+      </div>
+
+      <!-- Bottom Action Cluster -->
+      <div class="lobby-bottom-cluster">
+        <!-- Bottom Left within cluster: Inventory & Shop Tiles -->
+        <div class="lobby-tiles-grid">
+          <button class="lobby-tile-card tile-hangar" id="btn-menu-garage">
+            <div class="tile-icon">🤖</div>
+            <div class="tile-label">INVENTORY</div>
+            <div class="tile-sub">HANGAR</div>
+          </button>
+          <button class="lobby-tile-card tile-shop" id="btn-menu-weapons">
+            <span class="tile-badge-hot">NEW</span>
+            <div class="tile-icon">🛒</div>
+            <div class="tile-label">SHOP</div>
+            <div class="tile-sub">ARSENAL</div>
+          </button>
+        </div>
+
+        <!-- The Iconic Massive Coral-Red BATTLE Button -->
+        <div class="battle-button-wrapper">
+          <div class="battle-mode-selector-pill" id="btn-menu-modes-pill">
+            <span class="bm-mode" id="lobby-selected-mode">5v5 TEAM SKIRMISH</span>
+            <span class="bm-change">CHANGE ▾</span>
+          </div>
+
+          <button class="btn-lobby-battle" id="btn-menu-play">
+            <span class="battle-flare"></span>
+            <div class="battle-btn-inner">
+              <span class="battle-icon">⚔️</span>
+              <span class="battle-text">BATTLE</span>
+            </div>
+          </button>
+
+          <div class="combat-points-meter">
+            <span class="cpm-label">COMBAT POINT LIMIT</span>
+            <span class="cpm-val">198 / 600</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -248,23 +358,79 @@
   <!-- ══════════════════════════════════════════════════════ -->
   <!-- ── SCREEN 2: MECH GARAGE ───────────────────────────── -->
   <!-- ══════════════════════════════════════════════════════ -->
-  <div id="screen-mech-garage" class="ui-screen" style="display: none;">
-    <div class="screen-header">
-      <button class="btn-back-menu">◀ BACK</button>
-      <h2 class="screen-title">MECH GARAGE</h2>
+  <div id="screen-mech-garage" class="ui-screen ma-screen-hangar" style="display: none;">
+    <!-- Top Sub-Header -->
+    <div class="screen-header hangar-sub-header">
+      <button class="btn-back-menu" id="btn-back-from-garage">◀ BACK</button>
+      <div class="hangar-center-nav">
+        <div class="squad-dropdown-pill">SQUAD 1 ▾</div>
+        <button class="hangar-nav-pill">SKINS</button>
+      </div>
       <div class="header-spacer"></div>
     </div>
 
-    <div class="garage-workspace">
-      <!-- Left: Mech Roster Carousel -->
-      <div class="garage-sidebar left-sidebar">
-        <div class="sidebar-title">SELECT MECH</div>
-        <div class="garage-scroll-list" id="mech-selection-list"></div>
+    <div class="hangar-workspace-layout">
+      <!-- Left: Segmented Vertical Navigation Strip -->
+      <div class="hangar-nav-strip">
+        <button class="hangar-strip-tab active" data-tab="summary">
+          <span class="hst-icon">📊</span>
+          <span class="hst-label">SUMMARY</span>
+        </button>
+        <button class="hangar-strip-tab" data-tab="mech">
+          <span class="hst-icon">🤖</span>
+          <span class="hst-label">MECH</span>
+        </button>
+        <button class="hangar-strip-tab" data-tab="weapon1">
+          <span class="hst-icon">🔫</span>
+          <span class="hst-label">WEAPON 1</span>
+        </button>
+        <button class="hangar-strip-tab" data-tab="weapon2">
+          <span class="hst-icon">💥</span>
+          <span class="hst-label">WEAPON 2</span>
+        </button>
+        <button class="hangar-strip-tab" data-tab="pilots">
+          <span class="hst-icon">🧑‍✈️</span>
+          <span class="hst-label">PILOTS</span>
+        </button>
+        <button class="hangar-strip-tab" data-tab="mods">
+          <span class="hst-icon">⚡</span>
+          <span class="hst-label">MODS</span>
+        </button>
       </div>
 
-      <!-- Right: Selected Mech Stats & Upgrades -->
-      <div class="garage-sidebar right-sidebar">
-        <div class="inspect-card">
+      <!-- Center 3D Stage Overlay: Cycle chevrons and power rating -->
+      <div class="hangar-center-stage">
+        <div class="hangar-cycle-row">
+          <button class="btn-cycle-mech btn-cycle-prev" id="btn-garage-mech-prev" aria-label="Previous Mech">❮</button>
+          <div class="hangar-power-badge">
+            <span class="hpb-bolt">⚡</span>
+            <span class="hpb-val" id="hangar-mech-power">1,316</span>
+            <span class="hpb-label">POWER</span>
+          </div>
+          <button class="btn-cycle-mech btn-cycle-next" id="btn-garage-mech-next" aria-label="Next Mech">❯</button>
+        </div>
+
+        <!-- Mech Roster Selection Carousel (Active in MECH tab) -->
+        <div class="hangar-roster-tray" id="mech-selection-list" style="display: none;"></div>
+      </div>
+
+      <!-- Right: Frosted Glass Stats, Weapons & Upgrade Card -->
+      <div class="hangar-right-panel">
+        <div class="inspect-card frosted-glass-card">
+          <!-- Pilot Info Capsule -->
+          <div class="pilot-glass-row">
+            <div class="pgr-avatar">🧑‍🚀</div>
+            <div class="pgr-info">
+              <div class="pgr-name">CROW</div>
+              <div class="pgr-stars">⭐⭐⭐⭐⭐</div>
+            </div>
+            <div class="pgr-energy-pill">
+              <span class="pgr-el">ENERGY</span>
+              <span class="pgr-ev" id="hangar-energy-val">16/32</span>
+            </div>
+          </div>
+
+          <!-- Chassis Title & Role -->
           <div class="inspect-header">
             <div>
               <div class="inspect-title" id="mech-inspect-name">IRONCLAD-X1</div>
@@ -274,7 +440,7 @@
           </div>
           <div class="inspect-desc" id="mech-inspect-desc"></div>
 
-          <!-- Stats Bars -->
+          <!-- Exact Numeric Stats & Segmented Bars -->
           <div class="stat-group">
             <div class="stat-row">
               <span>HULL INTEGRITY</span>
@@ -299,6 +465,20 @@
               <span id="mech-bar-armor-text">High</span>
             </div>
             <div class="stat-bar-track"><div class="stat-bar-fill fill-armor" id="mech-bar-armor"></div></div>
+          </div>
+
+          <!-- Equipped Weapons Mini-Tiles -->
+          <div class="equipped-weapons-row">
+            <div class="eq-weapon-tile" id="hangar-eq-wep1">
+              <div class="ewt-tag">WEAPON 1</div>
+              <div class="ewt-name" id="hangar-wep1-name">PULSE CANNON</div>
+              <div class="ewt-stat" id="hangar-wep1-stat">45 DMG · LV. 1</div>
+            </div>
+            <div class="eq-weapon-tile" id="hangar-eq-wep2">
+              <div class="ewt-tag">WEAPON 2</div>
+              <div class="ewt-name" id="hangar-wep2-name">SCATTER BLASTER</div>
+              <div class="ewt-stat" id="hangar-wep2-stat">96 DMG · LV. 1</div>
+            </div>
           </div>
 
           <!-- Ability Info -->

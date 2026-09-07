@@ -38,6 +38,7 @@ window.IT = window.IT || {};
       this._bindGameModeEvents();
       this._bindArenaSelectEvents();
       this._bindMechGarageEvents();
+      this._bindMechArenaEvents();
       this._bindWeaponGarageEvents();
       this._bindLoadoutEvents();
       this._bindCareerEvents();
@@ -288,6 +289,96 @@ window.IT = window.IT || {};
       });
     }
 
+    _bindMechArenaEvents() {
+      const playClick = () => {
+        if (IT.AudioManager) IT.AudioManager.playUI('CLICK');
+      };
+
+      // 1. Pilot Profile click on header -> opens Career
+      this._on('btn-header-profile', 'click', () => {
+        playClick();
+        this.showScreen(SCREENS.CAREER);
+      });
+
+      // 2. Game Mode selector pill on Lobby BATTLE button
+      this._on('btn-menu-modes-pill', 'click', () => {
+        playClick();
+        this.showScreen(SCREENS.GAME_MODES);
+      });
+
+      // 3. Mech cycling helper function
+      const allMechs = IT.MechRegistry.getAll();
+      const cycleMech = (direction) => {
+        playClick();
+        let idx = allMechs.findIndex(m => m.id === this.selectedInspectMechId);
+        if (idx === -1) idx = 0;
+        idx = (idx + direction + allMechs.length) % allMechs.length;
+        const targetMech = allMechs[idx];
+        this.selectedInspectMechId = targetMech.id;
+
+        const loadout = IT.SaveManager.getLoadout();
+        this.garageScene.previewMech(targetMech.id, loadout.primaryId, loadout.secondaryId);
+        this._renderMechInspectCard(targetMech.id);
+
+        // Highlight active card in roster tray if open
+        document.querySelectorAll('.mech-select-card').forEach(c => {
+          c.classList.toggle('active', c.id === `mech-card-${targetMech.id}`);
+        });
+      };
+
+      // 4. Lobby Chevrons
+      this._on('btn-lobby-mech-prev', 'click', () => cycleMech(-1));
+      this._on('btn-lobby-mech-next', 'click', () => cycleMech(1));
+
+      // 5. Garage Chevrons
+      this._on('btn-garage-mech-prev', 'click', () => cycleMech(-1));
+      this._on('btn-garage-mech-next', 'click', () => cycleMech(1));
+
+      // 6. Hangar Left Segmented Tab Strip
+      document.querySelectorAll('.hangar-strip-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          playClick();
+          document.querySelectorAll('.hangar-strip-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+
+          const tabType = tab.getAttribute('data-tab');
+          const rosterTray = document.getElementById('mech-selection-list');
+
+          if (tabType === 'mech') {
+            if (rosterTray) rosterTray.style.display = 'flex';
+          } else {
+            if (rosterTray) rosterTray.style.display = 'none';
+          }
+
+          if (tabType === 'weapon1' || tabType === 'weapon2') {
+            this.showScreen(SCREENS.WEAPONS_GARAGE);
+          } else if (tabType === 'pilots') {
+            this._showToast('PILOT SYSTEM: CROW (SQUAD COMMANDER) · RANK ⭐⭐⭐⭐⭐');
+          } else if (tabType === 'mods') {
+            this._showToast('MOD CHIPS: RECHARGE BOOST +15%, KINETIC ARMOR +10%');
+          }
+        });
+      });
+
+      // 7. Crate Reward Buttons
+      this._on('crate-star-card', 'click', () => {
+        playClick();
+        this._showToast('STAR CRATE: EARN 6 MORE STARS IN MATCHES TO OPEN!');
+      });
+
+      this._on('crate-combat-card', 'click', () => {
+        playClick();
+        const res = IT.SaveManager.addCredits(250);
+        this.updateHeaderCurrencies();
+        this._showToast('COMBAT CRATE CLAIMED! +250 CREDITS, +15 MATS');
+        const fill = document.querySelector('#crate-combat-card .cp-fill');
+        if (fill) {
+          fill.style.width = '20%';
+          fill.classList.remove('ready');
+        }
+      });
+    }
+
     _renderMechInspectCard(mechId) {
       const isUnlocked = IT.SaveManager.isMechUnlocked(mechId);
       const curLvl = IT.SaveManager.getMechLevel(mechId);
@@ -308,6 +399,34 @@ window.IT = window.IT || {};
       if (descEl) descEl.textContent = stats.description || '';
       if (abilityNameEl) abilityNameEl.textContent = stats.abilityName;
       if (abilityDescEl) abilityDescEl.textContent = stats.abilityDesc;
+
+      // Calculate Mech Power Rating
+      const powerRating = Math.floor(stats.maxHp * 0.12 + stats.maxShield * 0.12 + curLvl * 90 + 420);
+      const lobbyPowerEl = document.getElementById('lobby-active-mech-power');
+      const lobbyNameEl = document.getElementById('lobby-active-mech-name');
+      const hangarPowerEl = document.getElementById('hangar-mech-power');
+
+      if (lobbyPowerEl) lobbyPowerEl.textContent = `${powerRating.toLocaleString()} POWER`;
+      if (lobbyNameEl) lobbyNameEl.textContent = stats.name;
+      if (hangarPowerEl) hangarPowerEl.textContent = `${powerRating.toLocaleString()}`;
+
+      // Equipped Weapons in Hangar Card
+      const priDef = IT.WeaponRegistry.get(loadout.primaryId);
+      const secDef = IT.WeaponRegistry.get(loadout.secondaryId);
+      const priLvl = IT.SaveManager.getWeaponLevel(loadout.primaryId);
+      const secLvl = IT.SaveManager.getWeaponLevel(loadout.secondaryId);
+      const priStats = IT.WeaponRegistry.getStatsForLevel(loadout.primaryId, priLvl);
+      const secStats = IT.WeaponRegistry.getStatsForLevel(loadout.secondaryId, secLvl);
+
+      const wep1NameEl = document.getElementById('hangar-wep1-name');
+      const wep1StatEl = document.getElementById('hangar-wep1-stat');
+      const wep2NameEl = document.getElementById('hangar-wep2-name');
+      const wep2StatEl = document.getElementById('hangar-wep2-stat');
+
+      if (priDef && wep1NameEl) wep1NameEl.textContent = priDef.name;
+      if (priStats && wep1StatEl) wep1StatEl.textContent = `${priStats.damage} DMG · LV. ${priLvl}`;
+      if (secDef && wep2NameEl) wep2NameEl.textContent = secDef.name;
+      if (secStats && wep2StatEl) wep2StatEl.textContent = `${secStats.damage} DMG · LV. ${secLvl}`;
 
       // Stat bars
       this._setBar('mech-bar-hp', stats.maxHp, 7000, `${stats.maxHp} HP`);

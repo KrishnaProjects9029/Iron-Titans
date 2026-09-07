@@ -57,21 +57,25 @@ for (const d of dirs) {
   }
 }
 
-// Also sync directly to Android assets directory
+// Also sync directly to Android assets directory and assets/public (Capacitor target)
 const ANDROID_ASSETS = path.join(ROOT, 'android', 'app', 'src', 'main', 'assets');
-if (fs.existsSync(ANDROID_ASSETS)) {
-  console.log('[Android] Syncing web assets directly to Android assets folder...');
-  for (const file of rootFiles) {
-    const s = path.join(ROOT, file);
-    const d = path.join(ANDROID_ASSETS, file);
-    if (fs.existsSync(s)) fs.copyFileSync(s, d);
+const ANDROID_PUBLIC = path.join(ANDROID_ASSETS, 'public');
+
+[ANDROID_ASSETS, ANDROID_PUBLIC].forEach(targetDir => {
+  if (fs.existsSync(targetDir)) {
+    console.log(`[Android] Syncing web assets to ${path.relative(ROOT, targetDir)}...`);
+    for (const file of rootFiles) {
+      const s = path.join(ROOT, file);
+      const d = path.join(targetDir, file);
+      if (fs.existsSync(s)) fs.copyFileSync(s, d);
+    }
+    for (const d of dirs) {
+      const s = path.join(ROOT, d);
+      const dst = path.join(targetDir, d);
+      if (fs.existsSync(s)) copyRecursive(s, dst);
+    }
+    console.log(`  ✔ Synced to ${path.relative(ROOT, targetDir)}`);
   }
-  for (const d of dirs) {
-    const s = path.join(ROOT, d);
-    const dst = path.join(ANDROID_ASSETS, d);
-    if (fs.existsSync(s)) copyRecursive(s, dst);
-  }
-  console.log('  ✔ Synced to android/app/src/main/assets/');
-}
+});
 
 console.log('✔ Assets successfully generated and ready for Android packaging!');

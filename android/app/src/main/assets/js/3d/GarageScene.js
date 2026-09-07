@@ -46,88 +46,190 @@ window.IT = window.IT || {};
     }
 
     _buildHangarEnvironment() {
-      // 1. Concrete Industrial Floor with hazard stripes
-      const floorGeo = new THREE.PlaneGeometry(80, 80);
+      // 1. Glossy High-Tech Industrial Floor
+      const floorGeo = new THREE.PlaneGeometry(100, 100);
       const floorMat = new THREE.MeshStandardMaterial({
-        color: 0x121620,
-        roughness: 0.65,
-        metalness: 0.35
+        color: 0x0a0e18,
+        roughness: 0.35,
+        metalness: 0.65
       });
       const floor = new THREE.Mesh(floorGeo, floorMat);
       floor.rotation.x = -Math.PI / 2;
       floor.receiveShadow = true;
       this.hangarGroup.add(floor);
 
-      // Floor grid trim lines
-      const gridGeo = new THREE.PlaneGeometry(60, 0.3);
-      const trimMat = new THREE.MeshStandardMaterial({ color: 0x243044, roughness: 0.4 });
-      for (let z = -25; z <= 25; z += 10) {
-        const line = new THREE.Mesh(gridGeo, trimMat);
-        line.rotation.x = -Math.PI / 2;
-        line.position.set(0, 0.02, z);
-        this.hangarGroup.add(line);
-      }
+      // Floor grid neon seams & guidance vectors
+      const seamMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.35 });
+      [-12, -6, 0, 6, 12].forEach(x => {
+        const stripGeo = new THREE.PlaneGeometry(0.08, 40);
+        const strip = new THREE.Mesh(stripGeo, seamMat);
+        strip.rotation.x = -Math.PI / 2;
+        strip.position.set(x, 0.02, -5);
+        this.hangarGroup.add(strip);
+      });
 
-      // 2. Heavy Hydraulic Turntable Platform
-      const tableGeo = new THREE.CylinderGeometry(5.2, 5.6, 0.6, 32);
+      // 2. Heavy Hydraulic Turntable Platform (Center)
+      const tableGeo = new THREE.CylinderGeometry(5.4, 5.8, 0.5, 48);
       const tableMat = new THREE.MeshStandardMaterial({
-        color: 0x1c2432,
+        color: 0x141b29,
         metalness: 0.85,
-        roughness: 0.35
+        roughness: 0.28
       });
       this.turntable = new THREE.Mesh(tableGeo, tableMat);
-      this.turntable.position.set(0, 0.3, 0);
+      this.turntable.position.set(0, 0.25, 0);
       this.turntable.receiveShadow = true;
       this.hangarGroup.add(this.turntable);
 
-      // Glowing circular hazard neon ring on turntable
-      const ringGeo = new THREE.TorusGeometry(4.8, 0.1, 8, 32);
-      const ringMat = new THREE.MeshStandardMaterial({
-        color: 0x000000,
-        emissive: 0x00c8ff,
-        emissiveIntensity: 2.0
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.rotation.x = Math.PI / 2;
-      ring.position.set(0, 0.61, 0);
-      this.hangarGroup.add(ring);
+      // Dual Concentric Neon Rings on Turntable
+      const outerRingGeo = new THREE.TorusGeometry(5.0, 0.08, 12, 48);
+      const outerRingMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+      const outerRing = new THREE.Mesh(outerRingGeo, outerRingMat);
+      outerRing.rotation.x = Math.PI / 2;
+      outerRing.position.set(0, 0.51, 0);
+      this.turntable.add(outerRing);
 
-      // 3. High Industrial Ceiling Girders & Rafters
-      const girderMat = new THREE.MeshStandardMaterial({ color: 0x1a202c, metalness: 0.9, roughness: 0.5 });
+      const innerRingGeo = new THREE.TorusGeometry(3.6, 0.05, 8, 36);
+      const innerRingMat = new THREE.MeshBasicMaterial({ color: 0x0088ff });
+      const innerRing = new THREE.Mesh(innerRingGeo, innerRingMat);
+      innerRing.rotation.x = Math.PI / 2;
+      innerRing.position.set(0, 0.51, 0);
+      this.turntable.add(innerRing);
+
+      // 3. Flanking Squad Staging Pedestals (Left & Right Squad Mechs)
+      [-9.5, 9.5].forEach(px => {
+        const squadPadGeo = new THREE.CylinderGeometry(3.2, 3.5, 0.35, 32);
+        const squadPad = new THREE.Mesh(squadPadGeo, tableMat);
+        squadPad.position.set(px, 0.17, -2.5);
+        squadPad.receiveShadow = true;
+        this.hangarGroup.add(squadPad);
+
+        const padRingGeo = new THREE.TorusGeometry(2.9, 0.06, 8, 32);
+        const padRing = new THREE.Mesh(padRingGeo, new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.6 }));
+        padRing.rotation.x = Math.PI / 2;
+        padRing.position.set(px, 0.36, -2.5);
+        this.hangarGroup.add(padRing);
+
+        // Holographic vertical guide pillar
+        const holoBeamGeo = new THREE.CylinderGeometry(2.8, 2.8, 6.0, 24, 1, true);
+        const holoBeamMat = new THREE.MeshBasicMaterial({
+          color: 0x00f0ff,
+          transparent: true,
+          opacity: 0.06,
+          side: THREE.DoubleSide
+        });
+        const holoBeam = new THREE.Mesh(holoBeamGeo, holoBeamMat);
+        holoBeam.position.set(px, 3.3, -2.5);
+        this.hangarGroup.add(holoBeam);
+      });
+
+      // 4. Panoramic Space Bay Window & Station Architecture (Backdrop)
+      // Space Starfield
+      const starGeo = new THREE.BufferGeometry();
+      const starCount = 1000;
+      const starCoords = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount * 3; i += 3) {
+        starCoords[i] = (Math.random() - 0.5) * 160;
+        starCoords[i + 1] = Math.random() * 60 + 5;
+        starCoords[i + 2] = -40 - Math.random() * 50;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starCoords, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0xddeeff, size: 0.7, transparent: true, opacity: 0.85 });
+      const stars = new THREE.Points(starGeo, starMat);
+      this.hangarGroup.add(stars);
+
+      // Distant Gas Giant Planet / Celestial Horizon
+      const planetGeo = new THREE.SphereGeometry(22, 32, 32);
+      const planetMat = new THREE.MeshStandardMaterial({
+        color: 0x0c2540,
+        emissive: 0x003366,
+        emissiveIntensity: 0.4,
+        roughness: 0.7
+      });
+      const planet = new THREE.Mesh(planetGeo, planetMat);
+      planet.position.set(32, 14, -60);
+      this.hangarGroup.add(planet);
+
+      // Planet Atmospheric Rim Ring
+      const atmoRingGeo = new THREE.RingGeometry(22.2, 23.5, 48);
+      const atmoRingMat = new THREE.MeshBasicMaterial({
+        color: 0x00c8ff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.65
+      });
+      const atmoRing = new THREE.Mesh(atmoRingGeo, atmoRingMat);
+      atmoRing.position.set(32, 14, -59.5);
+      this.hangarGroup.add(atmoRing);
+
+      // Panoramic Hangar Window Arch & Struts
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x111624, metalness: 0.9, roughness: 0.3 });
+      const windowArch = new THREE.BoxGeometry(70, 1.8, 1.8);
+      const topBeam = new THREE.Mesh(windowArch, frameMat);
+      topBeam.position.set(0, 18, -22);
+      this.hangarGroup.add(topBeam);
+
+      const bottomBeam = new THREE.Mesh(windowArch, frameMat);
+      bottomBeam.position.set(0, 1.0, -22);
+      this.hangarGroup.add(bottomBeam);
+
+      [-28, -14, 0, 14, 28].forEach(sx => {
+        const strutGeo = new THREE.BoxGeometry(1.4, 18, 1.4);
+        const strut = new THREE.Mesh(strutGeo, frameMat);
+        strut.position.set(sx, 9.5, -22);
+        this.hangarGroup.add(strut);
+
+        // Vertical Cyan LED Pillar Trim
+        const ledGeo = new THREE.PlaneGeometry(0.12, 17);
+        const led = new THREE.Mesh(ledGeo, new THREE.MeshBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.7 }));
+        led.position.set(sx, 9.5, -21.2);
+        this.hangarGroup.add(led);
+      });
+
+      // Translucent Observation Glass
+      const glassGeo = new THREE.PlaneGeometry(68, 17);
+      const glassMat = new THREE.MeshStandardMaterial({
+        color: 0x002244,
+        metalness: 0.95,
+        roughness: 0.1,
+        transparent: true,
+        opacity: 0.28
+      });
+      const glass = new THREE.Mesh(glassGeo, glassMat);
+      glass.position.set(0, 9.5, -21.8);
+      this.hangarGroup.add(glass);
+
+      // 5. Overhead Industrial Girders & High Rafters
       [-12, 0, 12].forEach(gx => {
-        const beamGeo = new THREE.BoxGeometry(1.2, 1.2, 50);
-        const beam = new THREE.Mesh(beamGeo, girderMat);
-        beam.position.set(gx, 15, 0);
-        this.hangarGroup.add(beam);
+        const girderGeo = new THREE.BoxGeometry(1.2, 1.2, 40);
+        const girder = new THREE.Mesh(girderGeo, frameMat);
+        girder.position.set(gx, 18, -2);
+        this.hangarGroup.add(girder);
       });
 
-      // 4. Robotic Maintenance Station Arms
-      [-7, 7].forEach(rx => {
-        const baseGeo = new THREE.CylinderGeometry(0.8, 1.0, 3.5, 8);
-        const base = new THREE.Mesh(baseGeo, girderMat);
-        base.position.set(rx, 1.75, -5);
-        this.hangarGroup.add(base);
-
-        const armGeo = new THREE.BoxGeometry(0.4, 0.4, 5.0);
-        const arm = new THREE.Mesh(armGeo, tableMat);
-        arm.position.set(rx, 4.0, -3.0);
-        arm.rotation.x = -Math.PI * 0.15;
-        this.hangarGroup.add(arm);
-      });
-
-      // 5. Dramatic Hangar Lighting Rig
-      const keyLight = new THREE.DirectionalLight(0xddeeff, 1.4);
-      keyLight.position.set(10, 18, 12);
+      // 6. Dramatic AAA Studio Lighting Rig
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      keyLight.position.set(8, 20, 14);
       keyLight.castShadow = true;
       this.hangarGroup.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0x00c8ff, 1.2);
-      rimLight.position.set(-12, 12, -10);
-      this.hangarGroup.add(rimLight);
+      // Electric Cyan Rim Light (Left)
+      const rimLightCyan = new THREE.DirectionalLight(0x00f0ff, 1.6);
+      rimLightCyan.position.set(-15, 12, -8);
+      this.hangarGroup.add(rimLightCyan);
 
-      const fillLight = new THREE.PointLight(0xff7722, 1.5, 25);
-      fillLight.position.set(0, 1.5, 6);
-      this.hangarGroup.add(fillLight);
+      // Warm Amber Accent Rim Light (Right)
+      const rimLightAmber = new THREE.DirectionalLight(0xff6622, 1.0);
+      rimLightAmber.position.set(16, 10, -8);
+      this.hangarGroup.add(rimLightAmber);
+
+      // Ground Turntable Uplight
+      const platformUplight = new THREE.PointLight(0x00c8ff, 2.2, 12);
+      platformUplight.position.set(0, 0.8, 0);
+      this.hangarGroup.add(platformUplight);
+
+      // Ambient Floor Fill Light
+      const ambientFloor = new THREE.HemisphereLight(0x1a2b4c, 0x050810, 1.1);
+      this.hangarGroup.add(ambientFloor);
     }
 
     _setupInputListeners() {
