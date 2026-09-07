@@ -120,8 +120,19 @@ window.IT = window.IT || {};
         if (IT.AudioManager) IT.AudioManager.playUI('CLICK');
       };
 
-      // Main menu buttons
-      this._on('btn-menu-play', 'click', () => { playClick(); this.showScreen(SCREENS.GAME_MODES); });
+      // Main menu buttons — BATTLE button now directly launches matchmaking
+      this._on('btn-menu-play', 'click', () => {
+        playClick();
+        const loadout = IT.SaveManager.getLoadout();
+        const mech = IT.MechRegistry.get(loadout.mechId);
+        const pri = IT.WeaponRegistry.get(loadout.primaryId);
+        const sec = IT.WeaponRegistry.get(loadout.secondaryId);
+        if (!mech || !pri || !sec) {
+          this._showToast('INVALID LOADOUT: MISSING EQUIPMENT. VISIT GARAGE FIRST.');
+          return;
+        }
+        this._triggerMatchmaking(loadout);
+      });
       this._on('btn-menu-missions', 'click', () => { playClick(); this.showScreen(SCREENS.MISSIONS); this.renderMissions(this.activeMissionTab); });
       this._on('btn-menu-daily', 'click', () => { playClick(); this.showDailyLoginModal(); });
       this._on('btn-menu-garage', 'click', () => { playClick(); this.showScreen(SCREENS.MECH_GARAGE); });
@@ -204,22 +215,43 @@ window.IT = window.IT || {};
       const modeCards = document.querySelectorAll('.mode-card');
       const curMode = IT.SaveManager.preferredMode || 'SKIRMISH';
 
+      const MODE_LABELS = {
+        SKIRMISH: '5v5 TEAM SKIRMISH',
+        DOMINATION: '5v5 DOMINATION',
+        CONTROL_POINT: '5v5 CONTROL POINT'
+      };
+
+      const updateModePill = (modeId) => {
+        const pillEl = document.getElementById('lobby-selected-mode');
+        if (pillEl) pillEl.textContent = MODE_LABELS[modeId] || modeId;
+      };
+
       modeCards.forEach(card => {
         const modeId = card.getAttribute('data-mode');
         if (modeId === curMode) card.classList.add('selected');
         else card.classList.remove('selected');
 
-        card.addEventListener('click', () => {
+        const selectAction = () => {
           modeCards.forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
           IT.SaveManager.preferredMode = modeId;
+          updateModePill(modeId);
 
           setTimeout(() => {
             this.showScreen(SCREENS.ARENA_SELECT);
           }, 150);
-        });
+        };
+
+        card.addEventListener('click', selectAction);
+        // Also wire the SELECT MODE button inside the card
+        const selectBtn = card.querySelector('.btn-select-mode');
+        if (selectBtn) selectBtn.addEventListener('click', (e) => { e.stopPropagation(); selectAction(); });
       });
+
+      // Init pill label on load
+      updateModePill(curMode);
     }
+
 
     // ── ARENA SELECTION ──
     _bindArenaSelectEvents() {
@@ -231,17 +263,33 @@ window.IT = window.IT || {};
         if (arenaId === curArena) card.classList.add('selected');
         else card.classList.remove('selected');
 
-        card.addEventListener('click', () => {
+        const arenaSelectAction = () => {
           arenaCards.forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
           IT.SaveManager.preferredArena = arenaId;
 
           setTimeout(() => {
-            this.showScreen(SCREENS.LOADOUT);
+            // Validate loadout before launching
+            const loadout = IT.SaveManager.getLoadout();
+            const mech = IT.MechRegistry.get(loadout.mechId);
+            const pri = IT.WeaponRegistry.get(loadout.primaryId);
+            const sec = IT.WeaponRegistry.get(loadout.secondaryId);
+            if (!mech || !pri || !sec) {
+              this._showToast('INVALID LOADOUT: VISIT GARAGE TO EQUIP WEAPONS FIRST.');
+              this.showScreen(SCREENS.MECH_GARAGE);
+              return;
+            }
+            this._triggerMatchmaking(loadout);
           }, 150);
-        });
+        };
+
+        card.addEventListener('click', arenaSelectAction);
+        // Wire the SELECT ARENA button inside each card
+        const selectArenaBtn = card.querySelector('.btn-select-arena');
+        if (selectArenaBtn) selectArenaBtn.addEventListener('click', (e) => { e.stopPropagation(); arenaSelectAction(); });
       });
     }
+
 
     // ── MECH GARAGE & SELECTION ──
     _bindMechGarageEvents() {
@@ -375,6 +423,28 @@ window.IT = window.IT || {};
         if (fill) {
           fill.style.width = '20%';
           fill.classList.remove('ready');
+        }
+      });
+
+      // 8. In-battle GARAGE/LEAVE button
+      this._on('btn-battle-leave', 'click', () => {
+        playClick();
+        this._promptExitBattle();
+      });
+
+      // 9. In-battle Touch UI toggle
+      this._on('btn-toggle-touch', 'click', () => {
+        playClick();
+        const panel = document.getElementById('touch-action-panel');
+        const joystick = document.getElementById('joystick-zone');
+        if (panel) {
+          const isHidden = panel.style.opacity === '0' || panel.style.display === 'none';
+          panel.style.opacity = isHidden ? '1' : '0';
+          panel.style.pointerEvents = isHidden ? 'auto' : 'none';
+          if (joystick) {
+            joystick.style.opacity = isHidden ? '1' : '0';
+            joystick.style.pointerEvents = isHidden ? 'auto' : 'none';
+          }
         }
       });
     }

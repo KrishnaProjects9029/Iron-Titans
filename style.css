@@ -844,6 +844,7 @@ html, body {
 .header-center-event {
   display: flex;
   align-items: center;
+  flex-shrink: 1;
 }
 
 .season-badge-pill {
@@ -855,6 +856,7 @@ html, body {
   border-radius: 20px;
   padding: 4px 14px;
   backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .season-icon { font-size: 16px; }
@@ -869,16 +871,24 @@ html, body {
   font-weight: 900;
   letter-spacing: 1px;
   color: #ffd043;
+  white-space: nowrap;
 }
 
 .season-timer {
   font-size: 9px;
   color: #94a3b8;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .season-pts {
   color: #00f0ff;
+}
+
+@media (max-width: 860px) {
+  .header-center-event {
+    display: none !important;
+  }
 }
 
 /* Currencies (Top Right) */
@@ -1954,79 +1964,117 @@ html, body {
 }
 
 /* ── Screen 4: Loadout Screen ── */
+#screen-loadout {
+  overflow-y: auto;
+}
+
 .loadout-summary-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 24px;
+  gap: 14px;
+  padding: 12px 16px;
   pointer-events: auto;
+  min-height: 0;
 }
 
 .loadout-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 220px);
-  gap: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  max-width: 920px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .loadout-card {
   background: rgba(10, 14, 26, 0.88);
   border: 1.5px solid rgba(0, 240, 255, 0.3);
   border-radius: 10px;
-  padding: 16px;
+  padding: 12px 14px;
   backdrop-filter: blur(8px);
   text-align: center;
+  flex: 1;
+  min-width: 110px;
+  max-width: 210px;
+  transition: border-color 0.2s;
+}
+
+.loadout-card:hover {
+  border-color: rgba(0, 240, 255, 0.6);
 }
 
 .loadout-slot-tag {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
   letter-spacing: 1.5px;
   color: #00f0ff;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
 }
 
 .loadout-slot-name {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 900;
   color: #ffffff;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
+  line-height: 1.2;
 }
 
 .loadout-slot-desc {
-  font-size: 11px;
+  font-size: 10px;
   color: #94a3b8;
 }
 
 .deploy-action-wrap {
-  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 4px;
 }
 
 .btn-deploy-battle {
-  background: linear-gradient(135deg, #00f0ff 0%, #0088ff 100%);
-  color: #040914;
+  background: linear-gradient(135deg, #ff4722 0%, #ff1744 50%, #c62828 100%);
+  color: #ffffff;
   border: none;
   font-family: inherit;
   font-size: 18px;
   font-weight: 900;
-  letter-spacing: 2px;
-  border-radius: 28px;
-  padding: 16px 48px;
+  letter-spacing: 2.5px;
+  border-radius: 6px;
+  padding: 16px 44px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 6px 24px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 6px 28px rgba(255, 71, 34, 0.55), 0 0 0 1px rgba(255,71,34,0.3);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  min-width: 260px;
 }
 
 .btn-deploy-battle:hover {
   transform: scale(1.04);
-  box-shadow: 0 8px 32px rgba(0, 240, 255, 0.7);
+  box-shadow: 0 8px 36px rgba(255, 71, 34, 0.75), 0 0 0 2px rgba(255,71,34,0.5);
 }
 
 .btn-deploy-battle:active { transform: scale(0.96); }
+
+.deploy-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 0 6px rgba(255,220,0,0.8));
+}
+
+.deploy-text {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
 
 /* ── Screen 5: Career Screen ── */
 .career-container {
@@ -3974,5 +4022,237 @@ body.scale-large {
     padding-right: max(16px, env(safe-area-inset-right));
     padding-top: max(8px, env(safe-area-inset-top));
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE LANDSCAPE RESPONSIVE FIXES — QA PASS
+   Target: 360px–412px viewport height (landscape phones)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* All sub-screens must scroll if content overflows */
+.ui-screen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch targets — minimum 44×44px per HIG/WCAG */
+button,
+.btn-pill,
+.btn-pill-small,
+.btn-back-menu,
+.touch-btn,
+.lobby-tile-card,
+.mode-card,
+.arena-card,
+.loadout-card,
+.mech-select-card,
+.weapon-select-card,
+.hangar-strip-tab {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Settings screen — compact rows on small landscape screens */
+@media (max-height: 430px) {
+  .settings-container {
+    gap: 10px;
+    padding: 8px 16px;
+  }
+  .settings-card {
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .setting-row {
+    padding: 4px 0;
+    min-height: 36px;
+  }
+  .settings-group-title {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .screen-header {
+    padding: 8px 20px;
+    min-height: 44px;
+  }
+  .screen-title {
+    font-size: 15px;
+  }
+  /* Hide season center banner on very small landscape */
+  .header-center-event {
+    display: none !important;
+  }
+  /* Compact loadout cards */
+  .loadout-card {
+    padding: 8px 10px;
+    min-width: 90px;
+  }
+  .loadout-slot-name {
+    font-size: 11px;
+  }
+  .btn-deploy-battle {
+    font-size: 15px;
+    padding: 13px 32px;
+    min-width: 220px;
+  }
+  /* Career stats compact grid */
+  .career-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .career-stat-box {
+    padding: 8px 6px;
+  }
+  .cs-label {
+    font-size: 8px;
+  }
+  .cs-value {
+    font-size: 14px;
+  }
+  /* Modes grid compact */
+  .modes-grid {
+    gap: 8px;
+    padding: 8px 16px;
+  }
+  .mode-card {
+    padding: 10px 12px;
+  }
+  .mode-desc {
+    font-size: 10px;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  /* Arenas grid compact */
+  .arenas-grid {
+    gap: 8px;
+    padding: 8px 16px;
+  }
+  .arena-card {
+    padding: 8px;
+  }
+  .arena-thumb {
+    height: 52px;
+  }
+  .arena-desc {
+    display: none;
+  }
+}
+
+/* Hangar right panel overflow on small screens */
+@media (max-height: 480px) {
+  .hangar-right-panel {
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+  }
+  .inspect-card {
+    padding: 10px 14px;
+  }
+  .stat-group {
+    gap: 4px;
+  }
+  .stat-row {
+    font-size: 10px;
+  }
+}
+
+/* Missions screen compact */
+@media (max-height: 430px) {
+  .missions-tab-bar {
+    gap: 6px;
+    padding: 6px 12px;
+  }
+  .tab-btn {
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+  .missions-grid {
+    gap: 8px;
+    padding: 6px 12px;
+  }
+  .mission-card {
+    padding: 10px 12px;
+  }
+  .mission-title {
+    font-size: 12px;
+  }
+  .mission-desc {
+    font-size: 10px;
+  }
+}
+
+/* Battle HUD touch buttons — bigger, more tappable */
+.touch-btn {
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: 50%;
+}
+
+#btn-fire-touch {
+  min-width: 80px;
+  min-height: 80px;
+}
+
+/* Ensure joystick zone doesn't obscure UI screens */
+#joystick-zone,
+#touch-action-panel {
+  /* Only visible in battle screen — handled via JS show/hide */
+  pointer-events: none;
+}
+
+/* Screen-level pointer-events only when active */
+#screen-battle #joystick-zone,
+#screen-battle #touch-action-panel {
+  pointer-events: auto;
+}
+
+/* Prevent body scroll bleed-through on Android WebView */
+body {
+  overscroll-behavior: none;
+}
+
+/* Loading screen always centered */
+#screen-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Match reward modal — scrollable on small screens */
+.reward-modal-box {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Upgrade modal scrollable */
+.modal-box {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* First-launch modal compact */
+.first-launch-modal-box {
+  max-width: 480px;
+  width: 90vw;
+}
+
+/* Toast notifications — always above everything */
+#notification-toast-container {
+  z-index: 99990;
+  pointer-events: none;
+}
+
+/* Back buttons — minimum size for Android back nav */
+.btn-back-menu {
+  min-width: 80px;
+  min-height: 44px;
+  font-size: 13px;
+  padding: 8px 16px;
+}
+
+/* Network status pill not overlapping other elements */
+#net-status-pill {
+  max-width: 120px;
+  overflow: hidden;
 }
 
