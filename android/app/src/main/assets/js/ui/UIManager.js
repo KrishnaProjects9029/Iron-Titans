@@ -1532,15 +1532,33 @@ window.IT = window.IT || {};
         }
       }
 
-      if (btnFirstLaunch) {
-        btnFirstLaunch.addEventListener('click', () => {
-          const callsign = (inputFirstLaunch && inputFirstLaunch.value.trim()) || 'TitanPilot';
+      const confirmFirstLaunch = () => {
+        const callsign = (inputFirstLaunch && inputFirstLaunch.value.trim()) || 'TitanPilot';
+        if (IT.SaveManager) {
           IT.SaveManager.pilotName = callsign;
           IT.SaveManager.setFirstLaunchComplete();
-          if (firstLaunchModal) firstLaunchModal.style.display = 'none';
-          this.updateHeaderCurrencies();
-          this.showToast('PILOT REGISTERED', `Welcome Commander ${callsign}! Combat link established.`, '🤖');
-          if (IT.AudioManager) IT.AudioManager.playUI('UPGRADE');
+        }
+        if (firstLaunchModal) firstLaunchModal.style.display = 'none';
+        this.updateHeaderCurrencies();
+        this.showToast('PILOT REGISTERED', `Welcome Commander ${callsign}! Combat link established.`, '🤖');
+        if (IT.AudioManager) IT.AudioManager.playUI('UPGRADE');
+      };
+
+      if (btnFirstLaunch) {
+        btnFirstLaunch.addEventListener('click', confirmFirstLaunch);
+      }
+
+      if (inputFirstLaunch) {
+        inputFirstLaunch.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') confirmFirstLaunch();
+        });
+      }
+
+      if (firstLaunchModal) {
+        firstLaunchModal.addEventListener('click', (e) => {
+          if (e.target === firstLaunchModal) {
+            confirmFirstLaunch();
+          }
         });
       }
 
@@ -1631,6 +1649,29 @@ window.IT = window.IT || {};
           errScreen.style.display = 'none';
           this.showScreen(SCREENS.MAIN_MENU);
         });
+      }
+    }
+
+    showToast(title, message, icon = 'ℹ️') {
+      if (IT.NotificationManager && typeof IT.NotificationManager.show === 'function') {
+        IT.NotificationManager.show({ title, message, icon });
+      } else {
+        this._showToast(`${icon} ${title}: ${message}`);
+      }
+    }
+
+    _showToast(msg) {
+      if (IT.NotificationManager && typeof IT.NotificationManager.show === 'function') {
+        IT.NotificationManager.show({ title: 'NOTICE', message: msg, icon: '🤖' });
+        return;
+      }
+      const container = document.getElementById('notification-toast-container');
+      if (container) {
+        const toast = document.createElement('div');
+        toast.className = 'notification-toast toast-visible';
+        toast.innerHTML = `<span class="toast-icon">ℹ️</span><div class="toast-content"><div class="toast-title">NOTICE</div><div class="toast-message">${msg}</div></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3000);
       }
     }
 

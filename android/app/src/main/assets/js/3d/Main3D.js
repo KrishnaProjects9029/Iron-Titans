@@ -848,6 +848,7 @@ window.IT = window.IT || {};
       }
     }
   }
+  }
 
   IT.Main3D = Main3D;
 

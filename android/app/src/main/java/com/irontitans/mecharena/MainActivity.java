@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         mWebView = findViewById(R.id.game_webview);
+        mWebView.setFocusable(true);
+        mWebView.setFocusableInTouchMode(true);
+        mWebView.requestFocus();
 
         // Configure Local Asset Loader for secure origin local storage access
         mAssetLoader = new WebViewAssetLoader.Builder()
@@ -64,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 return mAssetLoader.shouldInterceptRequest(request.getUrl());
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                android.util.Log.e("IronTitans", "WebView Error: " + errorCode + " - " + description + " URL: " + failingUrl);
             }
 
             @Override
