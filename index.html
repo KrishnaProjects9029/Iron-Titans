@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#070913" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Iron Titans" />
+  <meta name="description" content="Iron Titans 3D — Real-Time 5v5 Tactical Mech Arena & Mech Customization." />
+  <title>Iron Titans 3D — Mech Arena & Garage</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/favicon.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Portrait Orientation Blocker ────────────────────── -->
+  <div id="portrait-warning">
+    <div class="rotate-icon">📱 ➔ 🔄</div>
+    <div class="rotate-title">PLEASE ROTATE DEVICE</div>
+    <div class="rotate-desc">Iron Titans is optimized for landscape combat gameplay.</div>
+  </div>
+
+  <!-- ── 3D WebGL Canvas ─────────────────────────────────── -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- ── Global Menu Header (Level, XP, Credits, Materials, Network, Version) ── -->
+  <div id="menu-header">
+    <div class="header-left">
+      <div class="pilot-badge">
+        <span class="pilot-title" id="menu-pilot-title">PILOT</span>
+        <span class="pilot-level" id="menu-level-val">1</span>
+      </div>
+      <div class="pilot-xp-wrap">
+        <div class="pilot-xp-bar"><div id="menu-xp-progress" style="width: 0%;"></div></div>
+        <span class="pilot-xp-text" id="menu-xp-text">0 / 800 XP</span>
+      </div>
+      <div id="net-status-pill" class="net-status-pill net-online">
+        <span class="net-dot"></span> <span id="net-status-text">ONLINE</span> <span class="net-ping" id="net-ping-display">35ms</span>
+      </div>
+      <div class="version-tag" id="menu-version-tag">v1.0.0</div>
+    </div>
+    <div class="header-right">
+      <div class="currency-badge">
+        <span class="curr-icon">🔧</span>
+        <span class="curr-val" id="menu-mats-val">50</span>
+        <span class="curr-label">MATS</span>
+      </div>
+      <div class="currency-badge">
+        <span class="curr-icon">🪙</span>
+        <span class="curr-val" id="menu-tokens-val">5</span>
+        <span class="curr-label">TOKENS</span>
+      </div>
+      <div class="currency-badge">
+        <span class="curr-icon">💎</span>
+        <span class="curr-val" id="menu-credits-val">1,000</span>
+        <span class="curr-label">CREDITS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 1: MAIN MENU ─────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-main-menu" class="ui-screen">
+    <div class="main-menu-brand">
+      <h1 class="game-logo">IRON TITANS</h1>
+      <div class="game-tagline">3D TACTICAL MECH ARENA</div>
+    </div>
+
+    <div class="main-menu-nav">
+      <button class="nav-btn nav-btn-primary" id="btn-menu-play-online">
+        <span class="nav-btn-glow"></span>
+        <span class="nav-btn-text">🌐 PLAY ONLINE (5v5)</span>
+      </button>
+      <button class="nav-btn nav-btn-secondary" id="btn-menu-play">
+        <span class="nav-btn-text">⚔️ BATTLE (OFFLINE)</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-missions">
+        <span class="nav-btn-text">📋 MISSIONS</span>
+        <span class="nav-badge" id="badge-missions" style="display: none;">0</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-daily">
+        <span class="nav-btn-text">🎁 DAILY REWARD</span>
+        <span class="nav-badge ready" id="badge-daily-reward">!</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-garage">
+        <span class="nav-btn-text">🤖 MECH GARAGE</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-weapons">
+        <span class="nav-btn-text">💥 WEAPONS</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-loadout">
+        <span class="nav-btn-text">⚙️ LOADOUT</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-career">
+        <span class="nav-btn-text">🏆 CAREER</span>
+      </button>
+      <button class="nav-btn" id="btn-menu-settings">
+        <span class="nav-btn-text">🔧 SETTINGS</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 1B: GAME MODES ───────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-game-modes" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu" id="btn-back-from-modes">◀ BACK</button>
+      <h2 class="screen-title">GAME MODES</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="modes-grid">
+      <!-- 1. Team Skirmish -->
+      <div class="mode-card selected" data-mode="SKIRMISH" id="mode-card-skirmish">
+        <div class="mode-badge-top">5v5 · 5:00</div>
+        <div class="mode-icon">⚔️</div>
+        <div class="mode-title">TEAM SKIRMISH</div>
+        <div class="mode-desc">Fast-paced team deathmatch. Eliminate enemy mechs to score points. First team to 25 eliminations wins.</div>
+        <div class="mode-win-cond">WIN: 25 ELIMINATIONS</div>
+        <button class="btn-select-mode">SELECT MODE</button>
+      </div>
+
+      <!-- 2. Domination -->
+      <div class="mode-card" data-mode="DOMINATION" id="mode-card-domination">
+        <div class="mode-badge-top">5v5 · 6:00</div>
+        <div class="mode-icon">🛡️</div>
+        <div class="mode-title">DOMINATION</div>
+        <div class="mode-desc">Capture and hold strategic zones A, B, and C. Each controlled zone yields points over time. First to 300 points wins.</div>
+        <div class="mode-win-cond">WIN: 300 POINTS</div>
+        <button class="btn-select-mode">SELECT MODE</button>
+      </div>
+
+      <!-- 3. Control Point -->
+      <div class="mode-card" data-mode="CONTROL_POINT" id="mode-card-controlpoint">
+        <div class="mode-badge-top">5v5 · 7:00</div>
+        <div class="mode-icon">📡</div>
+        <div class="mode-title">CONTROL POINT</div>
+        <div class="mode-desc">Fight for a single rotating active objective (+2 pts/sec). Defend against enemy capture squads across sectors.</div>
+        <div class="mode-win-cond">WIN: 300 POINTS</div>
+        <button class="btn-select-mode">SELECT MODE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 1C: ARENA SELECT ─────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-arena-select" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu" id="btn-back-from-arenas">◀ BACK</button>
+      <h2 class="screen-title">ARENA SELECT</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="arenas-grid">
+      <!-- Arena 1: Neon Forge -->
+      <div class="arena-card selected" data-arena="NEON_FORGE" id="arena-card-neon">
+        <div class="arena-range-badge range-mid">MEDIUM RANGE</div>
+        <div class="arena-thumb thumb-neon"></div>
+        <div class="arena-info">
+          <div class="arena-name">NEON FORGE</div>
+          <div class="arena-tagline">INDUSTRIAL WEAPONS FACILITY</div>
+          <div class="arena-desc">Balanced tactical theater with elevated catwalks, hexagonal reactor pillars, and molten hazard channels.</div>
+          <button class="btn-select-arena">SELECT ARENA</button>
+        </div>
+      </div>
+
+      <!-- Arena 2: Titan Docks -->
+      <div class="arena-card" data-arena="TITAN_DOCKS" id="arena-card-docks">
+        <div class="arena-range-badge range-long">LONG / MID RANGE</div>
+        <div class="arena-thumb thumb-docks"></div>
+        <div class="arena-info">
+          <div class="arena-name">TITAN DOCKS</div>
+          <div class="arena-tagline">CARGO SHIPPING TERMINAL</div>
+          <div class="arena-desc">Massive container terminal with towering gantry cranes, double-decker container stacks, and wide firing lanes.</div>
+          <button class="btn-select-arena">SELECT ARENA</button>
+        </div>
+      </div>
+
+      <!-- Arena 3: Ashen Reactor -->
+      <div class="arena-card" data-arena="ASHEN_REACTOR" id="arena-card-reactor">
+        <div class="arena-range-badge range-close">CLOSE / MID RANGE</div>
+        <div class="arena-thumb thumb-reactor"></div>
+        <div class="arena-info">
+          <div class="arena-name">ASHEN REACTOR</div>
+          <div class="arena-tagline">SUBTERRANEAN ENERGY CORE</div>
+          <div class="arena-desc">Hazardous plasma reactor facility with reinforced blast bulkheads, turbine chambers, and tight choke points.</div>
+          <button class="btn-select-arena">SELECT ARENA</button>
+        </div>
+      </div>
+
+      <!-- Random Arena -->
+      <div class="arena-card arena-card-random" data-arena="RANDOM" id="arena-card-random">
+        <div class="arena-range-badge range-any">TACTICAL CHOICE</div>
+        <div class="arena-thumb thumb-random">🎲</div>
+        <div class="arena-info">
+          <div class="arena-name">RANDOM ARENA</div>
+          <div class="arena-tagline">DYNAMIC DEPLOYMENT</div>
+          <div class="arena-desc">Auto-select a random combat theater matching the chosen game mode.</div>
+          <button class="btn-select-arena">SELECT RANDOM</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MATCHMAKING SIMULATION OVERLAY ─────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="matchmaking-overlay" style="display: none;">
+    <div class="mm-modal">
+      <div class="mm-spinner"></div>
+      <div class="mm-status" id="mm-status-text">MATCH FOUND!</div>
+      <div class="mm-subtitle">5v5 COMBAT SIMULATION</div>
+      <div class="mm-rosters">
+        <div class="mm-team mm-blue">
+          <div class="mm-team-title">BLUE SQUAD (5)</div>
+          <div class="mm-players" id="mm-blue-list">
+            <div>PILOT (YOU)</div>
+            <div>BLUE AI-1</div>
+            <div>BLUE AI-2</div>
+            <div>BLUE AI-3</div>
+            <div>BLUE AI-4</div>
+          </div>
+        </div>
+        <div class="mm-vs">VS</div>
+        <div class="mm-team mm-red">
+          <div class="mm-team-title">RED SQUAD (5)</div>
+          <div class="mm-players" id="mm-red-list">
+            <div>RED AI-1</div>
+            <div>RED AI-2</div>
+            <div>RED AI-3</div>
+            <div>RED AI-4</div>
+            <div>RED AI-5</div>
+          </div>
+        </div>
+      </div>
+      <div class="mm-countdown" id="mm-countdown">DEPLOYING IN 3s...</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 2: MECH GARAGE ───────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-mech-garage" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu">◀ BACK</button>
+      <h2 class="screen-title">MECH GARAGE</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="garage-workspace">
+      <!-- Left: Mech Roster Carousel -->
+      <div class="garage-sidebar left-sidebar">
+        <div class="sidebar-title">SELECT MECH</div>
+        <div class="garage-scroll-list" id="mech-selection-list"></div>
+      </div>
+
+      <!-- Right: Selected Mech Stats & Upgrades -->
+      <div class="garage-sidebar right-sidebar">
+        <div class="inspect-card">
+          <div class="inspect-header">
+            <div>
+              <div class="inspect-title" id="mech-inspect-name">IRONCLAD-X1</div>
+              <div class="inspect-subtitle" id="mech-inspect-role">Tank</div>
+            </div>
+            <div class="inspect-level-badge" id="mech-inspect-level">LEVEL 1</div>
+          </div>
+          <div class="inspect-desc" id="mech-inspect-desc"></div>
+
+          <!-- Stats Bars -->
+          <div class="stat-group">
+            <div class="stat-row">
+              <span>HULL INTEGRITY</span>
+              <span id="mech-bar-hp-text">5000 HP</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-hp" id="mech-bar-hp"></div></div>
+
+            <div class="stat-row">
+              <span>SHIELD CAPACITY</span>
+              <span id="mech-bar-shield-text">2000 SHIELD</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-shield" id="mech-bar-shield"></div></div>
+
+            <div class="stat-row">
+              <span>TOP SPEED</span>
+              <span id="mech-bar-speed-text">14.0 SPEED</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-speed" id="mech-bar-speed"></div></div>
+
+            <div class="stat-row">
+              <span>ARMOR RATING</span>
+              <span id="mech-bar-armor-text">High</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-armor" id="mech-bar-armor"></div></div>
+          </div>
+
+          <!-- Ability Info -->
+          <div class="inspect-ability-card">
+            <div class="ability-title-row">
+              <span class="ability-icon">⚡</span>
+              <span class="ability-name" id="mech-inspect-ability-name">Energy Charge</span>
+            </div>
+            <div class="ability-desc" id="mech-inspect-ability-desc">Surges forward with high kinetic thrusters.</div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="inspect-actions">
+            <button class="btn-pill active-glow" id="btn-mech-equip">SELECT MECH</button>
+            <button class="btn-pill btn-upgrade" id="btn-mech-upgrade">UPGRADE (250 C)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 3: WEAPONS GARAGE ────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-weapons-garage" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu">◀ BACK</button>
+      <h2 class="screen-title">WEAPONS ARSENAL</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="garage-workspace">
+      <!-- Left: Weapon Carousel -->
+      <div class="garage-sidebar left-sidebar">
+        <div class="sidebar-title">WEAPON ARSENAL</div>
+        <div class="garage-scroll-list" id="weapon-selection-list"></div>
+      </div>
+
+      <!-- Right: Weapon Specs & Upgrades -->
+      <div class="garage-sidebar right-sidebar">
+        <div class="inspect-card">
+          <div class="inspect-header">
+            <div>
+              <div class="inspect-title" id="weapon-inspect-name">PULSE CANNON</div>
+              <div class="inspect-subtitle" id="weapon-inspect-type">PRIMARY WEAPON</div>
+            </div>
+            <div class="inspect-level-badge" id="weapon-inspect-level">LEVEL 1</div>
+          </div>
+          <div class="inspect-desc" id="weapon-inspect-desc"></div>
+
+          <!-- Weapon Stats Bars -->
+          <div class="stat-group">
+            <div class="stat-row">
+              <span>DAMAGE PER HIT</span>
+              <span id="wep-bar-dmg-text">45 DMG</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-dmg" id="wep-bar-dmg"></div></div>
+
+            <div class="stat-row">
+              <span>CYCLE RATE</span>
+              <span id="wep-bar-rate-text">0.18s</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-rate" id="wep-bar-rate"></div></div>
+
+            <div class="stat-row">
+              <span>MAGAZINE SIZE</span>
+              <span id="wep-bar-mag-text">28 RDS</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-mag" id="wep-bar-mag"></div></div>
+
+            <div class="stat-row">
+              <span>RELOAD TIME</span>
+              <span id="wep-bar-reload-text">1.8s</span>
+            </div>
+            <div class="stat-bar-track"><div class="stat-bar-fill fill-reload" id="wep-bar-reload"></div></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="inspect-actions">
+            <button class="btn-pill active-glow" id="btn-weapon-equip-primary">EQUIP PRIMARY</button>
+            <button class="btn-pill" id="btn-weapon-equip-secondary">EQUIP SECONDARY</button>
+            <button class="btn-pill btn-upgrade" id="btn-weapon-upgrade">UPGRADE (200 C)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 4: LOADOUT & BATTLE DEPLOYMENT ───────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-loadout" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu">◀ BACK</button>
+      <h2 class="screen-title">BATTLE LOADOUT</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="loadout-summary-container">
+      <div class="loadout-grid">
+        <div class="loadout-card">
+          <div class="loadout-slot-tag">CHASSIS</div>
+          <div class="loadout-slot-name" id="loadout-mech-name">IRONCLAD-X1</div>
+          <div class="loadout-slot-desc" id="loadout-mech-role">Tank</div>
+        </div>
+
+        <div class="loadout-card">
+          <div class="loadout-slot-tag">PRIMARY WEAPON</div>
+          <div class="loadout-slot-name" id="loadout-pri-name">PULSE CANNON</div>
+          <div class="loadout-slot-desc">Slot 1 (Right Arm)</div>
+        </div>
+
+        <div class="loadout-card">
+          <div class="loadout-slot-tag">SECONDARY WEAPON</div>
+          <div class="loadout-slot-name" id="loadout-sec-name">SCATTER BLASTER</div>
+          <div class="loadout-slot-desc">Slot 2 (Left Arm)</div>
+        </div>
+
+        <div class="loadout-card">
+          <div class="loadout-slot-tag">SPECIAL ABILITY</div>
+          <div class="loadout-slot-name" id="loadout-ability-name">Energy Charge</div>
+          <div class="loadout-slot-desc">Chassis Ability</div>
+        </div>
+      </div>
+
+      <div class="deploy-action-wrap">
+        <button class="btn-deploy-battle" id="btn-start-battle">
+          <span class="deploy-icon">⚡</span>
+          <span class="deploy-text">DEPLOY TO 5v5 BATTLE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 5: CAREER PROFILE ────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-career" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu">◀ BACK</button>
+      <h2 class="screen-title">PILOT CAREER</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="career-container">
+      <div class="career-stats-grid">
+        <div class="career-stat-box">
+          <div class="cs-label">PILOT RANK</div>
+          <div class="cs-value highlight" id="career-level">LEVEL 1</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">TOTAL MATCHES</div>
+          <div class="cs-value" id="career-matches">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">VICTORIES</div>
+          <div class="cs-value win-color" id="career-wins">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">DEFEATS</div>
+          <div class="cs-value lose-color" id="career-losses">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">WIN RATE</div>
+          <div class="cs-value" id="career-winrate">0%</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">TOTAL KILLS</div>
+          <div class="cs-value" id="career-kills">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">TOTAL DEATHS</div>
+          <div class="cs-value" id="career-deaths">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">K/D RATIO</div>
+          <div class="cs-value" id="career-kd">0.00</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">TOTAL ASSISTS</div>
+          <div class="cs-value" id="career-assists">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">DAMAGE DEALT</div>
+          <div class="cs-value" id="career-dmg-dealt">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">CREDIT BALANCE</div>
+          <div class="cs-value highlight" id="career-credits">1,000 C</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">OBJECTIVE CAPTURES</div>
+          <div class="cs-value highlight" id="career-captures">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">OBJECTIVE DEFENSES</div>
+          <div class="cs-value" id="career-defenses">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">OBJECTIVE TIME</div>
+          <div class="cs-value" id="career-obj-time">0s</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">BEST STREAK</div>
+          <div class="cs-value highlight" id="career-best-streak">0</div>
+        </div>
+        <div class="career-stat-box">
+          <div class="cs-label">BEST MATCH SCORE</div>
+          <div class="cs-value" id="career-best-score">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 6: SETTINGS ──────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-settings" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu">◀ BACK</button>
+      <h2 class="screen-title">SYSTEM SETTINGS</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="settings-container">
+      <!-- 1. AUDIO CHANNELS -->
+      <div class="settings-card">
+        <h3 class="settings-group-title">🔊 AUDIO CHANNELS</h3>
+        <div class="setting-row">
+          <span>MASTER VOLUME</span>
+          <input type="range" min="0" max="100" value="80" class="setting-slider" id="setting-slider-master">
+          <span class="setting-val-label" id="setting-lbl-master">80%</span>
+        </div>
+        <div class="setting-row">
+          <span>MUSIC VOLUME</span>
+          <input type="range" min="0" max="100" value="60" class="setting-slider" id="setting-slider-music">
+          <span class="setting-val-label" id="setting-lbl-music">60%</span>
+        </div>
+        <div class="setting-row">
+          <span>SFX VOLUME</span>
+          <input type="range" min="0" max="100" value="85" class="setting-slider" id="setting-slider-sfx">
+          <span class="setting-val-label" id="setting-lbl-sfx">85%</span>
+        </div>
+        <div class="setting-row">
+          <span>UI VOLUME</span>
+          <input type="range" min="0" max="100" value="75" class="setting-slider" id="setting-slider-ui">
+          <span class="setting-val-label" id="setting-lbl-ui">75%</span>
+        </div>
+        <div class="setting-row">
+          <span>MUTE ALL AUDIO</span>
+          <button class="btn-pill-small" id="setting-btn-mute">UNMUTED</button>
+        </div>
+      </div>
+
+      <!-- 2. GRAPHICS & PERFORMANCE -->
+      <div class="settings-card">
+        <h3 class="settings-group-title">🖥️ GRAPHICS & QUALITY</h3>
+        <div class="setting-row">
+          <span>GRAPHICS PRESET</span>
+          <button class="btn-pill-small" id="setting-btn-graphics">HIGH</button>
+        </div>
+        <div class="setting-row">
+          <span>PERFORMANCE MONITOR (FPS)</span>
+          <button class="btn-pill-small" id="setting-btn-fps">OFF</button>
+        </div>
+      </div>
+
+      <!-- 3. ACCESSIBILITY & CONTROLS -->
+      <div class="settings-card">
+        <h3 class="settings-group-title">♿ ACCESSIBILITY & COMBAT</h3>
+        <div class="setting-row">
+          <span>SCREEN SHAKE</span>
+          <button class="btn-pill-small" id="setting-btn-shake">MEDIUM</button>
+        </div>
+        <div class="setting-row">
+          <span>UI SCALE</span>
+          <button class="btn-pill-small" id="setting-btn-uiscale">MEDIUM</button>
+        </div>
+        <div class="setting-row">
+          <span>CROSSHAIR SIZE</span>
+          <button class="btn-pill-small" id="setting-btn-crosshair">MEDIUM</button>
+        </div>
+        <div class="setting-row">
+          <span>COLORBLIND PALETTE</span>
+          <button class="btn-pill-small" id="setting-btn-colorblind">DEFAULT</button>
+        </div>
+        <div class="setting-row">
+          <span>HAPTIC VIBRATION</span>
+          <button class="btn-pill-small" id="setting-btn-vibe">ENABLED</button>
+        </div>
+        <div class="setting-row">
+          <span>DAMAGE NUMBERS</span>
+          <button class="btn-pill-small" id="setting-btn-damagenumbers">ENABLED</button>
+        </div>
+      </div>
+
+      <!-- 4. MULTIPLAYER & NETWORKING (Phase 8) -->
+      <div class="settings-card">
+        <h3 class="settings-group-title">🌐 MULTIPLAYER & NETWORKING</h3>
+        <div class="setting-row">
+          <span>PILOT CALLSIGN</span>
+          <input type="text" id="setting-input-callsign" class="setting-text-input" maxlength="16" value="TitanPilot">
+        </div>
+        <div class="setting-row">
+          <span>SERVER REGION</span>
+          <button class="btn-pill-small" id="setting-btn-region">US-EAST</button>
+        </div>
+        <div class="setting-row">
+          <span>DISPLAY PING</span>
+          <button class="btn-pill-small" id="setting-btn-showping">ENABLED</button>
+        </div>
+        <div class="setting-row">
+          <span>NETWORK ADAPTER</span>
+          <button class="btn-pill-small" id="setting-btn-adapter">AUTO</button>
+        </div>
+        <div class="setting-row">
+          <span>NETWORK DEBUG PANEL</span>
+          <button class="btn-pill-small" id="setting-btn-devnet">SHOW</button>
+        </div>
+      </div>
+
+      <!-- 5. SAVE & DATA MANAGEMENT -->
+      <div class="settings-card">
+        <h3 class="settings-group-title">💾 DATA & PROFILE BACKUP</h3>
+        <div class="setting-row">
+          <span>EXPORT SAVE DATA</span>
+          <button class="btn-pill-small" id="setting-btn-export-save">EXPORT</button>
+        </div>
+        <div class="setting-row">
+          <span>IMPORT SAVE DATA</span>
+          <button class="btn-pill-small" id="setting-btn-import-save">IMPORT</button>
+        </div>
+        <div class="setting-row">
+          <span>RESET PROGRESSION</span>
+          <button class="btn-pill-small" id="setting-btn-reset-save" style="color: #ff3344; border-color: #ff3344;">RESET</button>
+        </div>
+      </div>
+
+      <!-- 6. RELEASE INFO & SYSTEM STATUS (Phase 10) -->
+      <div class="settings-card">
+        <h3 class="settings-group-title">🚀 RELEASE INFO & APP STATUS</h3>
+        <div class="setting-row">
+          <span>BUILD VERSION</span>
+          <span class="setting-val-label" style="color: #00e1ff; font-weight: 700;">v1.0.0 (FINAL)</span>
+        </div>
+        <div class="setting-row">
+          <span>APP ENVIRONMENT</span>
+          <span class="setting-val-label" id="setting-env-label">BROWSER / PWA</span>
+        </div>
+        <div class="setting-row">
+          <span>IMMERSIVE FULLSCREEN</span>
+          <button class="btn-pill-small" id="setting-btn-fullscreen">TOGGLE</button>
+        </div>
+        <div class="setting-row" id="setting-row-install" style="display: none;">
+          <span>INSTALL APP (PWA)</span>
+          <button class="btn-pill-small" id="setting-btn-install" style="color: #00e1ff; border-color: #00e1ff;">INSTALL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 1E: MISSIONS & ACHIEVEMENTS ──────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-missions" class="ui-screen" style="display: none;">
+    <div class="screen-header">
+      <button class="btn-back-menu" id="btn-back-from-missions">◀ BACK</button>
+      <h2 class="screen-title">MISSIONS & CHALLENGES</h2>
+      <div class="header-spacer"></div>
+    </div>
+
+    <div class="missions-tab-bar">
+      <button class="tab-btn active" data-tab="DAILY" id="tab-btn-daily">DAILY CHALLENGES</button>
+      <button class="tab-btn" data-tab="WEEKLY" id="tab-btn-weekly">WEEKLY MILESTONES</button>
+      <button class="tab-btn" data-tab="CAREER" id="tab-btn-career">CAREER DIRECTIVES</button>
+      <button class="tab-btn" data-tab="ACHIEVEMENTS" id="tab-btn-achievements">ACHIEVEMENTS</button>
+    </div>
+
+    <div class="missions-countdown-bar" id="missions-countdown-banner">
+      <span class="countdown-icon">⏱️</span>
+      <span id="missions-timer-text">RESETS IN 18h 42m</span>
+    </div>
+
+    <div class="missions-grid" id="missions-cards-container">
+      <!-- Dynamic mission cards populated via UIManager -->
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 6B: DEPLOYMENT LOADING SCREEN ─────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-loading" class="ui-screen" style="display: none;">
+    <div class="loading-wrap">
+      <div class="loading-logo">IRON TITANS</div>
+      <div class="loading-sub-title">COMBAT SIMULATION DEPLOYMENT</div>
+      <div class="loading-mech-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-core">🤖</div>
+      </div>
+      <div class="loading-status" id="loading-status-text">INITIALIZING WEAPON SYSTEMS...</div>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar-fill" id="loading-bar-fill" style="width: 0%;"></div>
+      </div>
+      <div class="loading-tip" id="loading-tip-text">TACTICAL TIP: Targeting rear reactor cores scores 1.75x critical damage.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN 7: 5v5 BATTLE HUD (Active in Combat) ─────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-battle" style="display: none;">
+    <!-- Screen Damage & Low Health Warning Vignettes -->
+    <div id="hud-damage-vignette" class="hud-damage-vignette"></div>
+    <div id="hud-low-hp-vignette" class="hud-low-hp-vignette" style="display: none;"></div>
+
+    <!-- Live Performance Debug Overlay -->
+    <div id="debug-fps-counter" class="debug-fps-panel" style="display: none;">
+      <span id="dbg-fps">60 FPS</span> | <span id="dbg-ft">16.6ms</span> | <span id="dbg-dc">Calls: 38</span> | <span id="dbg-tri">Tris: 14k</span> | <span id="dbg-proj">Proj: 0</span> | <span id="dbg-vfx">VFX: 0</span> | <span id="dbg-ping">Ping: 18ms</span>
+    </div>
+
+    <!-- Center Reticle & Target Lock & Hit Markers -->
+    <div id="hud-crosshair-wrap">
+      <div class="crosshair-dot"></div>
+      <div class="crosshair-reticle"></div>
+      <div class="target-indicator" id="target-indicator"></div>
+      <div id="hud-damage-indicators"></div>
+
+      <!-- Hit Markers -->
+      <div id="hud-hit-marker" class="hit-marker" style="display: none;"></div>
+      <div id="hud-hit-marker-crit" class="hit-marker-crit" style="display: none;">CRIT</div>
+      <div id="hud-hit-marker-elim" class="hit-marker-elim" style="display: none;">ELIMINATED</div>
+    </div>
+
+    <!-- Floating Combat Damage Text -->
+    <div id="fct-container"></div>
+
+    <!-- Match Intro Countdown Banner -->
+    <div id="match-countdown-banner" style="display: none;">
+      <span class="countdown-num">3</span>
+      <span class="countdown-sub">PREPARE FOR BATTLE</span>
+    </div>
+
+    <!-- Top HUD Bar: Minimap, Scores & Kill Feed -->
+    <div id="hud-top-bar">
+      <!-- 2D Radar Minimap -->
+      <div id="hud-minimap-container">
+        <canvas id="hud-minimap-canvas" width="114" height="114"></canvas>
+      </div>
+
+      <!-- Match Timer & Scores -->
+      <div id="hud-match-score">
+        <div class="hud-score-row">
+          <span class="score-team score-blue">BLUE <span id="score-blue">00</span></span>
+          <span id="hud-match-timer">05:00</span>
+          <span class="score-team score-red"><span id="score-red">00</span> RED</span>
+        </div>
+
+        <!-- Domination Zone Badges -->
+        <div id="hud-domination-bar" style="display: none;">
+          <div class="zone-badge status-neutral" id="zone-badge-a">A</div>
+          <div class="zone-badge status-neutral" id="zone-badge-b">B</div>
+          <div class="zone-badge status-neutral" id="zone-badge-c">C</div>
+        </div>
+
+        <!-- Control Point Indicator -->
+        <div id="hud-controlpoint-bar" style="display: none;">
+          <span class="cp-label">SECTOR:</span>
+          <span class="cp-sector-val" id="cp-sector-val">CENTER</span>
+          <span class="cp-status-badge status-neutral" id="cp-status-val">NEUTRAL</span>
+        </div>
+      </div>
+
+      <!-- Controls Toggle & Kill Feed -->
+      <div id="hud-top-right">
+        <button class="btn-pill-small" id="btn-toggle-touch" title="Toggle Touch UI">📱 TOUCH UI</button>
+        <button class="btn-pill-small" id="btn-battle-leave" title="Leave Battle">🚪 GARAGE</button>
+        <div id="kill-feed-container"></div>
+      </div>
+    </div>
+
+    <!-- Mode Announcement Banner (Killstreaks, Zone Captures, Rotation Alerts) -->
+    <div id="objective-announcement-banner" class="announcement-banner" style="display: none;"></div>
+
+    <!-- Death Screen & Spectator Killer Cam HUD -->
+    <div id="hud-death-screen" style="display: none;">
+      <div class="death-panel">
+        <div class="death-title">MECH DESTROYED</div>
+        <div class="death-killer-info">
+          <span>ELIMINATED BY: </span><strong id="death-killer-name">VALKYRIE-02</strong>
+        </div>
+        <div class="death-weapon-info">
+          <span>WEAPON: </span><strong id="death-killer-weapon">PLASMA CANNON</strong>
+          <span class="death-dist-wrap">(<span id="death-killer-distance">35m</span>)</span>
+        </div>
+        <div class="death-countdown">
+          RESPAWNING IN <span id="death-countdown-val">3</span>s
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Status Card (HP, Shield, Ammo) -->
+    <div id="hud-player-status">
+      <div class="hud-mech-name" id="hud-player-name">IRONCLAD-X1</div>
+      <div class="hud-bar-wrap" title="Shield Integrity">
+        <div class="hud-bar shield-bar" id="hud-shield-bar" style="width: 100%;"></div>
+      </div>
+      <div class="hud-bar-wrap" title="Hull Integrity">
+        <div class="hud-bar hp-bar" id="hud-hp-bar" style="width: 100%;"></div>
+      </div>
+      <div class="hud-ammo-wrap">
+        <span id="hud-ammo-label">PRIMARY WEAPON</span>
+        <span id="hud-ammo-count">28 / 28</span>
+      </div>
+      <div class="hud-reload-wrap">
+        <div id="hud-reload-progress"></div>
+      </div>
+    </div>
+
+    <!-- Virtual Joystick (Mobile) -->
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+
+    <!-- Mobile Action Buttons Panel -->
+    <div id="touch-action-panel">
+      <div class="action-row">
+        <!-- Target Lock -->
+        <button class="touch-btn" id="btn-lock-touch" aria-label="Target Lock">
+          <span class="touch-btn-icon">🎯</span>
+          <span class="touch-btn-label">Lock</span>
+        </button>
+
+        <!-- Reload -->
+        <button class="touch-btn" id="btn-reload-touch" aria-label="Reload Weapon">
+          <span class="touch-btn-icon">🔄</span>
+          <span class="touch-btn-label">Reload</span>
+        </button>
+
+        <!-- Secondary Weapon -->
+        <button class="touch-btn" id="btn-secondary-touch" aria-label="Secondary Weapon">
+          <span class="touch-btn-icon">💥</span>
+          <span class="touch-btn-label">Alt</span>
+        </button>
+
+        <!-- Special Ability -->
+        <button class="touch-btn" id="btn-ability-touch" aria-label="Special Ability">
+          <span class="touch-btn-icon" id="ability-cd-text">⚡</span>
+          <span class="touch-btn-label">Ability</span>
+        </button>
+      </div>
+
+      <div class="action-row">
+        <!-- Primary Fire Button -->
+        <button class="touch-btn" id="btn-fire-touch" aria-label="Primary Fire">
+          <span class="touch-btn-icon">🔥</span>
+          <span class="touch-btn-label">Fire</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MODAL 1: UPGRADE MODAL ──────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="upgrade-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-box-title" id="upgrade-modal-title">UPGRADE EQUIPMENT</div>
+      <div class="upgrade-modal-content" id="upgrade-modal-body"></div>
+      <div class="modal-actions">
+        <button class="btn-pill active-glow" id="btn-upgrade-confirm">CONFIRM UPGRADE</button>
+        <button class="btn-pill" id="btn-upgrade-cancel">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MODAL 2: MATCH REWARDS & LEVEL UP ───────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="match-reward-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box reward-modal-box">
+      <div class="reward-title win" id="reward-title">VICTORY</div>
+      <div class="reward-sub">5v5 TEAM BATTLE REWARDS</div>
+
+      <!-- Level Up Alert Banner -->
+      <div id="reward-levelup-banner" style="display: none;"></div>
+
+      <div class="reward-stats-grid">
+        <div class="reward-box">
+          <span class="rb-label">KILLS</span>
+          <span class="rb-val" id="reward-kills-val">0</span>
+        </div>
+        <div class="reward-box">
+          <span class="rb-label">ASSISTS</span>
+          <span class="rb-val" id="reward-assists-val">0</span>
+        </div>
+        <div class="reward-box">
+          <span class="rb-label">OBJECTIVES</span>
+          <span class="rb-val" id="reward-objectives-val">0</span>
+        </div>
+        <div class="reward-box">
+          <span class="rb-label">DAMAGE DEALT</span>
+          <span class="rb-val" id="reward-damage-val">0</span>
+        </div>
+        <div class="reward-box highlight-box">
+          <span class="rb-label">XP EARNED</span>
+          <span class="rb-val" id="reward-xp-val">+450 XP</span>
+        </div>
+        <div class="reward-box highlight-box">
+          <span class="rb-label">CREDITS EARNED</span>
+          <span class="rb-val" id="reward-credits-val">+650 C</span>
+        </div>
+        <div class="reward-box">
+          <span class="rb-label">NEW BALANCE</span>
+          <span class="rb-val" id="reward-new-credits">1,650 C</span>
+        </div>
+      </div>
+
+      <div class="modal-actions reward-actions">
+        <button class="btn-pill active-glow" id="btn-reward-play-again">PLAY AGAIN</button>
+        <button class="btn-pill" id="btn-reward-garage">GARAGE</button>
+        <button class="btn-pill" id="btn-reward-menu">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MODAL 3: 5v5 MULTIPLAYER MATCHMAKING ────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="modal-matchmaking" class="modal-overlay" style="display: none;">
+    <div class="modal-box mm-modal-box">
+      <div class="mm-header">
+        <div class="mm-radar-spinner">
+          <div class="radar-sweep"></div>
+          <div class="radar-dot dot1"></div>
+          <div class="radar-dot dot2"></div>
+        </div>
+        <div class="mm-title">MULTIPLAYER MATCHMAKING</div>
+        <div class="mm-status" id="mm-status-text">Searching for players...</div>
+        <div class="mm-count" id="mm-count-text"><span id="mm-found-count">1</span> / 10 COMBATANTS READY</div>
+      </div>
+
+      <!-- 5v5 Visual Roster -->
+      <div class="mm-roster-preview">
+        <!-- Blue Team (Allies) -->
+        <div class="mm-team-col team-blue-col">
+          <div class="mm-team-header blue-title">🔵 BLUE SQUAD (ALLIES)</div>
+          <div class="mm-slots-list" id="mm-blue-slots">
+            <div class="mm-slot filled" id="mm-slot-blue-0"><span class="slot-name">YOU</span><span class="slot-tag">PILOT</span></div>
+            <div class="mm-slot searching" id="mm-slot-blue-1"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-blue-2"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-blue-3"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-blue-4"><span class="slot-name">Searching...</span></div>
+          </div>
+        </div>
+
+        <div class="mm-vs-divider">VS</div>
+
+        <!-- Red Team (Opponents) -->
+        <div class="mm-team-col team-red-col">
+          <div class="mm-team-header red-title">🔴 RED SQUAD (OPPONENTS)</div>
+          <div class="mm-slots-list" id="mm-red-slots">
+            <div class="mm-slot searching" id="mm-slot-red-0"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-red-1"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-red-2"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-red-3"><span class="slot-name">Searching...</span></div>
+            <div class="mm-slot searching" id="mm-slot-red-4"><span class="slot-name">Searching...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-pill" id="btn-cancel-matchmaking">CANCEL SEARCH</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MODAL 4: 7-DAY DAILY LOGIN REWARD ───────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="modal-daily-login" class="modal-overlay" style="display: none;">
+    <div class="modal-box daily-modal-box">
+      <div class="modal-box-title">7-DAY PILOT SUPPLY CACHE</div>
+      <div class="daily-streak-badge" id="daily-streak-badge">🔥 1-DAY LOGIN STREAK</div>
+      <div class="daily-grid" id="daily-calendar-grid">
+        <!-- Rendered by UIManager -->
+      </div>
+      <div class="modal-actions">
+        <button class="btn-pill active-glow" id="btn-claim-daily-reward">CLAIM TODAY'S REWARD</button>
+        <button class="btn-pill" id="btn-close-daily-reward">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── NETWORK DEBUG OVERLAY PANEL ─────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="dev-network-panel" class="dev-network-overlay" style="display: none;">
+    <div class="dev-net-header">
+      <span>NET TELEMETRY DEBUG</span>
+      <button id="btn-close-dev-net" class="btn-close-sm">✕</button>
+    </div>
+    <div class="dev-net-body">
+      <div class="dev-net-row"><span>STATUS:</span> <span id="net-dbg-status">ONLINE</span></div>
+      <div class="dev-net-row"><span>PING / RTT:</span> <span id="net-dbg-ping">35 ms</span></div>
+      <div class="dev-net-row"><span>ADAPTER:</span> <span id="net-dbg-adapter">WebSocket / Loopback</span></div>
+      <div class="dev-net-row"><span>TICK RATE:</span> <span>20 Hz (50ms)</span></div>
+      <div class="dev-net-row"><span>ROOM ID:</span> <span id="net-dbg-room">--</span></div>
+      <div class="dev-net-row"><span>PLAYERS:</span> <span id="net-dbg-players">0 / 10</span></div>
+    </div>
+  </div>
+
+  <!-- 3D Remote Player Nameplates Container Overlay -->
+  <div id="nameplates-container" class="nameplates-overlay"></div>
+
+  <!-- Toast alert element -->
+  <div id="ui-toast"></div>
+  <div id="notification-toast-container" class="notification-toast-container"></div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MODAL 5: FIRST LAUNCH ONBOARDING (Phase 10) ─────── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="modal-first-launch" class="modal-overlay" style="display: none;">
+    <div class="modal-box first-launch-modal-box">
+      <div class="first-launch-badge">⚡ COMMAND PROTOCOL INITIALIZED ⚡</div>
+      <h2 class="first-launch-title">WELCOME TO IRON TITANS</h2>
+      <p class="first-launch-desc">Commander, your combat commission has been authorized. Enter your pilot callsign and confirm your starter assault mech chassis to enter the arena.</p>
+      
+      <div class="first-launch-field">
+        <label class="first-launch-label" for="input-first-launch-name">PILOT CALLSIGN</label>
+        <input type="text" id="input-first-launch-name" class="setting-text-input first-launch-input" maxlength="14" value="TitanPilot" />
+      </div>
+
+      <div class="starter-mech-card">
+        <div class="smp-icon">🤖</div>
+        <div class="smp-info">
+          <div class="smp-name">IRONCLAD MK-1 · ALL-ROUND ASSAULT</div>
+          <div class="smp-spec">Equipped with Dual Pulse Cannons & Scatter Blaster. Balanced speed, heavy armor plating, and Overdrive thrusters.</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-pill active-glow" id="btn-first-launch-confirm">INITIALIZE COMBAT SYSTEMS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── MODAL 6: EXIT / ABANDON CONFIRMATION (Phase 10) ─── -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="modal-exit-confirm" class="modal-overlay" style="display: none;">
+    <div class="modal-box exit-modal-box">
+      <div class="modal-box-title" id="exit-modal-title">ABANDON BATTLE?</div>
+      <p class="exit-modal-desc" id="exit-modal-desc">Exiting active combat will forfeit current match rewards and telemetry score.</p>
+      <div class="modal-actions">
+        <button class="btn-pill btn-danger" id="btn-exit-confirm-yes">CONFIRM EXIT</button>
+        <button class="btn-pill active-glow" id="btn-exit-confirm-cancel">RESUME COMBAT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ── SCREEN ERROR: TACTICAL RECOVERY BOUNDARY (Phase 10) ─ -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="screen-error" class="ui-screen error-screen" style="display: none;">
+    <div class="error-container">
+      <div class="error-icon">⚠️</div>
+      <h2 class="error-title">TACTICAL SIMULATION ANOMALY</h2>
+      <p class="error-desc" id="error-desc-text">A rendering interruption occurred. Your pilot profile and persistent progression remain safeguarded in local storage.</p>
+      <div class="error-actions">
+        <button class="btn-pill active-glow" id="btn-error-reload">RESTART SIMULATION</button>
+        <button class="btn-pill" id="btn-error-menu">RETURN TO MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Scripts ─────────────────────────────────────────── -->
+  <!-- 1. Three.js WebGL Engine -->
+  <script src="js/lib/three.min.js"></script>
+
+  <!-- 2. Utilities, Config & Registries -->
+  <script src="js/data/GameConfig.js"></script>
+  <script src="js/utils/MathUtils.js"></script>
+  <script src="js/utils/ObjectPool.js"></script>
+  <script src="js/data/MechRegistry.js"></script>
+  <script src="js/data/WeaponRegistry.js"></script>
+  <script src="js/utils/SaveManager.js"></script>
+  <script src="js/3d/arenas/ArenaRegistry.js"></script>
+
+  <!-- 2.5 Audio & PBR Material Engine (Phase 6) -->
+  <script src="js/audio/AudioManager.js"></script>
+  <script src="js/3d/MaterialSystem.js"></script>
+  <script src="js/3d/VFXManager.js"></script>
+
+  <!-- 2.7 Progression & Missions Engine (Phase 7) -->
+  <script src="js/progression/EventManager.js"></script>
+  <script src="js/progression/Progression2.js"></script>
+  <script src="js/progression/NotificationManager.js"></script>
+  <script src="js/progression/RewardManager.js"></script>
+  <script src="js/progression/MissionSystem.js"></script>
+
+  <!-- 2.8 Online Multiplayer Networking Engine (Phase 8) -->
+  <script src="js/network/NetworkProtocol.js"></script>
+  <script src="js/network/NetworkTransform.js"></script>
+  <script src="js/network/NetworkInterpolation.js"></script>
+  <script src="js/network/NetworkPlayer.js"></script>
+  <script src="js/network/NetworkCombat.js"></script>
+  <script src="js/network/ServerAdapter.js"></script>
+  <script src="js/network/NetworkClient.js"></script>
+  <script src="js/network/AuthManager.js"></script>
+  <script src="js/network/MatchmakingManager.js"></script>
+  <script src="js/network/NetworkRoom.js"></script>
+  <script src="js/network/NetworkManager.js"></script>
+
+  <!-- 3. Procedural 3D Builders & Arenas -->
+  <script src="js/3d/WeaponBuilder3D.js"></script>
+  <script src="js/3d/MechBuilder3D.js"></script>
+  <script src="js/3d/Mech3D.js"></script>
+  <script src="js/3d/Arena3D.js"></script>
+  <script src="js/3d/arenas/TitanDocksArena.js"></script>
+  <script src="js/3d/arenas/AshenReactorArena.js"></script>
+  <script src="js/3d/Engine3D.js"></script>
+  <script src="js/3d/ThirdPersonCamera.js"></script>
+  <script src="js/3d/GarageScene.js"></script>
+
+  <!-- 4. Game Modes & Objectives -->
+  <script src="js/modes/GameModeBase.js"></script>
+  <script src="js/modes/objectives/CaptureZone.js"></script>
+  <script src="js/modes/objectives/ControlPoint.js"></script>
+  <script src="js/modes/ObjectiveManager.js"></script>
+  <script src="js/modes/TeamSkirmishMode.js"></script>
+  <script src="js/modes/DominationMode.js"></script>
+  <script src="js/modes/ControlPointMode.js"></script>
+  <script src="js/modes/GameModeManager.js"></script>
+
+  <!-- 5. Controls & Input -->
+  <script src="js/3d/TouchInput.js"></script>
+  <script src="js/3d/InputManager.js"></script>
+  <script src="js/3d/TeamManager.js"></script>
+  <script src="js/3d/SpawnManager.js"></script>
+  <script src="js/3d/BotAI.js"></script>
+  <script src="js/3d/Combat3D.js"></script>
+  <script src="js/3d/MobileHUD.js"></script>
+  <script src="js/3d/MatchManager.js"></script>
+
+  <!-- 6. UI and Main Orchestrator -->
+  <script src="js/ui/UIManager.js"></script>
+  <script src="js/3d/Main3D.js"></script>
+
+  <!-- ── 7. PWA Service Worker Registration & Global Handlers (Phase 10) ── -->
+  <script>
+    if ('serviceWorker' in navigator && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => {
+            console.log('[PWA] ServiceWorker registered with scope:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('[PWA] ServiceWorker registration failed:', err);
+          });
+      });
+    }
+
+    // PWA Install Prompt Deferred Event Handling
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredInstallPrompt = e;
+      const installRow = document.getElementById('setting-row-install');
+      if (installRow) installRow.style.display = 'flex';
+      console.log('[PWA] beforeinstallprompt captured and ready');
+    });
+
+    // Global Unhandled Error Boundary Fallback
+    window.addEventListener('error', (evt) => {
+      console.error('[IT-FATAL] Caught unhandled exception:', evt.error || evt.message);
+      // If error happens during critical initialization or unrecoverable state, show error screen
+      if (document.body && !document.getElementById('screen-main-menu')) {
+        const errScreen = document.getElementById('screen-error');
+        if (errScreen) {
+          errScreen.style.display = 'flex';
+          const desc = document.getElementById('error-desc-text');
+          if (desc && evt.message) desc.textContent = evt.message;
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "iron-titans-3d",
+  "version": "1.0.0",
+  "description": "Iron Titans 3D — Real-Time 5v5 Tactical Mech Arena Shooter",
+  "private": true,
+  "scripts": {
+    "prepare-build": "node scripts/prepare_www.js",
+    "cap:sync": "npm run prepare-build && cap sync android",
+    "cap:open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/android": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

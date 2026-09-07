@@ -1,0 +1,43 @@
+{
+  "name": "IRON TITANS — 3D Mech Arena",
+  "short_name": "IRON TITANS",
+  "description": "Futuristic 3D Mech Arena Shooter with Real-Time 5v5 Skirmishes, Tactical Objectives, and Modular Progression.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#070913",
+  "theme_color": "#00e1ff",
+  "lang": "en",
+  "categories": [
+    "games",
+    "action",
+    "simulation"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

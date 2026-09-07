@@ -1,0 +1,24 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Capacitor Web directory (generated dynamically on build)
+www/
+
+# Android build outputs & local properties
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/*.iml
+android/app/*.iml
+android/.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Brain & scratch artifacts
+.system_generated/

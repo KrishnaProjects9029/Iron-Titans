@@ -1,0 +1,15 @@
+{
+  "appId": "com.irontitans.mecharena",
+  "appName": "Iron Titans",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "backgroundColor": "#070913",
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  }
+}
