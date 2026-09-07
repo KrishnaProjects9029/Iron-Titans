@@ -4193,17 +4193,17 @@ button,
   min-height: 80px;
 }
 
-/* Ensure joystick zone doesn't obscure UI screens */
-#joystick-zone,
-#touch-action-panel {
-  /* Only visible in battle screen — handled via JS show/hide */
-  pointer-events: none;
+/* Ensure joystick zone and touch buttons operate cleanly */
+#joystick-zone {
+  pointer-events: auto;
 }
 
-/* Screen-level pointer-events only when active */
-#screen-battle #joystick-zone,
-#screen-battle #touch-action-panel {
-  pointer-events: auto;
+#touch-action-panel {
+  pointer-events: none !important;
+}
+
+.touch-btn {
+  pointer-events: auto !important;
 }
 
 /* Prevent body scroll bleed-through on Android WebView */

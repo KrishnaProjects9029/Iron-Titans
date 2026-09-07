@@ -157,13 +157,15 @@ window.IT = window.IT || {};
         if (camDist > 0.1) {
           _camDir.normalize();
           this.raycaster.set(this.currentLookAt, _camDir);
-          this.raycaster.far = camDist;
-          const hits = this.raycaster.intersectObjects(arenaObstacles, false);
-          if (hits.length > 0) {
-            const hitDist = Math.max(2.5, hits[0].distance - 0.6);
-            camX = this.currentLookAt.x + _camDir.x * hitDist;
-            camY = this.currentLookAt.y + _camDir.y * hitDist;
-            camZ = this.currentLookAt.z + _camDir.z * hitDist;
+          const validObstacles = arenaObstacles.filter(o => o && o.isObject3D && o.visible !== false);
+          if (validObstacles.length > 0) {
+            const hits = this.raycaster.intersectObjects(validObstacles, false);
+            if (hits.length > 0) {
+              const hitDist = Math.max(2.5, hits[0].distance - 0.6);
+              camX = this.currentLookAt.x + _camDir.x * hitDist;
+              camY = this.currentLookAt.y + _camDir.y * hitDist;
+              camZ = this.currentLookAt.z + _camDir.z * hitDist;
+            }
           }
         }
       }

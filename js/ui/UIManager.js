@@ -161,6 +161,10 @@ window.IT = window.IT || {};
       });
 
       this.currentScreen = screenId;
+      const menuHeader = document.getElementById('menu-header');
+      if (menuHeader) {
+        menuHeader.style.display = (screenId === SCREENS.BATTLE || screenId === SCREENS.LOADING) ? 'none' : 'flex';
+      }
       this.updateHeaderCurrencies();
 
       // Music context switching

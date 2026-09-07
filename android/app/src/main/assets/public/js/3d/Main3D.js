@@ -239,6 +239,10 @@ window.IT = window.IT || {};
 
       // 8. Start 5v5 Match Countdown
       this.matchManager.resetMatch(this.allMechs);
+
+      if (this.uiManager) {
+        this.uiManager.showScreen(IT.SCREENS.BATTLE);
+      }
     }
 
     startOnlineBattle(room) {

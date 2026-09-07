@@ -55,6 +55,11 @@ window.IT = window.IT || {};
       this.scores[TEAMS.RED] = 0;
     }
 
+    resetScores() {
+      this.scores[TEAMS.BLUE] = 0;
+      this.scores[TEAMS.RED] = 0;
+    }
+
     addMech(mech, team) {
       if (!team || !this.roster[team]) {
         team = TEAMS.BLUE;

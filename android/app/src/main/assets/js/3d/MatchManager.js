@@ -174,7 +174,9 @@ window.IT = window.IT || {};
       this.timer = this.matchDuration;
       this.killFeed = [];
 
-      this.teamManager.resetScores();
+      if (this.teamManager && typeof this.teamManager.resetScores === 'function') {
+        this.teamManager.resetScores();
+      }
       if (this.hud) {
         this.hud.blueScore = 0;
         this.hud.redScore = 0;

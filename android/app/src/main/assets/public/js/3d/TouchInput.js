@@ -143,6 +143,13 @@ window.IT = window.IT || {};
     }
 
     _onTouchStart(e) {
+      const battleScreen = document.getElementById('screen-battle');
+      if (!battleScreen || battleScreen.style.display === 'none') {
+        return;
+      }
+      const activeModal = document.querySelector('.modal-overlay[style*="display: flex"]');
+      if (activeModal) return;
+
       const screenW = window.innerWidth;
       const screenH = window.innerHeight;
 

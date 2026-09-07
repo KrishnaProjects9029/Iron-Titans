@@ -93,7 +93,7 @@ window.IT = window.IT || {};
       this.stats.clear();
       this.streaks.clear();
 
-      if (this.teamManager) {
+      if (this.teamManager && typeof this.teamManager.resetScores === 'function') {
         this.teamManager.resetScores();
       }
 
