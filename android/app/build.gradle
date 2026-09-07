@@ -21,10 +21,10 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug // Default to debug keys for local builds
+            signingConfig signingConfigs.debug // Default to debug keys for local/testing builds; replace with release keystore for production
         }
         debug {
             applicationIdSuffix ".debug"
