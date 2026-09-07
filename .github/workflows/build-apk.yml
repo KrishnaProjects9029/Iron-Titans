@@ -22,6 +22,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: 🐘 Set up Gradle 8.5
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
       - name: 🟢 Set up Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -37,26 +42,10 @@ jobs:
       - name: ⚡ Capacitor Sync
         run: npx cap sync android
 
-      - name: 🔑 Ensure Gradle Wrapper & Permissions
-        run: |
-          cd android
-          if [ ! -f "gradlew" ]; then
-            echo "Generating Gradle Wrapper via global Gradle..."
-            gradle wrapper || true
-          fi
-          if [ -f "gradlew" ]; then
-            chmod +x gradlew
-          fi
-          cd ..
-
       - name: 🏗️ Build Android Debug APK
         run: |
           cd android
-          if [ -f "gradlew" ]; then
-            ./gradlew assembleDebug --no-daemon
-          else
-            gradle assembleDebug --no-daemon
-          fi
+          gradle assembleDebug --no-daemon --stacktrace
 
       - name: 🚀 Upload Installable APK Artifact
         uses: actions/upload-artifact@v4
