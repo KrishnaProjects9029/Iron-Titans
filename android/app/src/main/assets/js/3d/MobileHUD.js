@@ -357,7 +357,7 @@ window.IT = window.IT || {};
       }
 
       // 1. Update Match Timer & Scores Display
-      this._updateTopBar();
+      this._updateTopBar(allMechs);
 
       // 2. Update Directional Damage Indicators
       for (let i = this.damageIndicators.length - 1; i >= 0; i--) {
@@ -378,7 +378,7 @@ window.IT = window.IT || {};
       this._renderMinimap(playerMech, allMechs, arenaColliders);
     }
 
-    _updateTopBar() {
+    _updateTopBar(allMechs) {
       const timerEl = document.getElementById('hud-match-timer');
       const scoreBlueEl = document.getElementById('score-blue');
       const scoreRedEl = document.getElementById('score-red');
@@ -386,15 +386,35 @@ window.IT = window.IT || {};
       if (timerEl) {
         const m = Math.floor(this.matchTime / 60);
         const s = Math.floor(this.matchTime % 60);
-        timerEl.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        timerEl.textContent = `⏱ ${m}:${s < 10 ? '0' : ''}${s}`;
       }
 
       if (scoreBlueEl) {
-        scoreBlueEl.textContent = this.blueScore < 10 ? `0${this.blueScore}` : this.blueScore;
+        scoreBlueEl.textContent = this.blueScore;
       }
 
       if (scoreRedEl) {
-        scoreRedEl.textContent = this.redScore < 10 ? `0${this.redScore}` : this.redScore;
+        scoreRedEl.textContent = this.redScore;
+      }
+
+      // Update 5v5 Squad Helmet Status (Alive/Dead indicators)
+      if (allMechs && allMechs.length > 0) {
+        const blueMechs = allMechs.filter(m => m.team === 'blue');
+        const redMechs = allMechs.filter(m => m.team === 'red');
+
+        const blueHelmets = document.querySelectorAll('#blue-squad-helmets .squad-helmet');
+        blueHelmets.forEach((h, idx) => {
+          const m = blueMechs[idx];
+          if (m && m.isDead) h.className = 'squad-helmet dead';
+          else h.className = 'squad-helmet active';
+        });
+
+        const redHelmets = document.querySelectorAll('#red-squad-helmets .squad-helmet');
+        redHelmets.forEach((h, idx) => {
+          const m = redMechs[idx];
+          if (m && m.isDead) h.className = 'squad-helmet red dead';
+          else h.className = 'squad-helmet active red';
+        });
       }
     }
 
@@ -403,8 +423,11 @@ window.IT = window.IT || {};
 
       const hpBar = document.getElementById('hud-hp-bar');
       const shieldBar = document.getElementById('hud-shield-bar');
-      const ammoCount = document.getElementById('hud-ammo-count');
-      const reloadBar = document.getElementById('hud-reload-progress');
+      const hpNumeric = document.getElementById('hud-hp-numeric');
+      const ammoPrimary = document.getElementById('hud-ammo-primary-val');
+      const ammoSecondary = document.getElementById('hud-ammo-secondary-val');
+      const reloadWrapLeft = document.getElementById('hud-reload-wrap-left');
+      const reloadFillLeft = document.getElementById('hud-reload-fill-left');
 
       if (hpBar) {
         const pct = Math.max(0, (playerMech.hp / playerMech.maxHp) * 100);
@@ -416,23 +439,33 @@ window.IT = window.IT || {};
         shieldBar.style.width = `${pct}%`;
       }
 
+      if (hpNumeric) {
+        const num = (playerMech.hp >= 1000) ? (playerMech.hp / 1000).toFixed(1) + 'k' : Math.round(playerMech.hp);
+        hpNumeric.textContent = num;
+      }
+
       if (combat) {
-        if (ammoCount) {
-          ammoCount.textContent = combat.isReloading ? 'RELOAD' : `${combat.ammo} / ${combat.maxAmmo}`;
-          if (combat.isReloading || combat.ammo <= 6) {
-            ammoCount.classList.add('ammo-low');
+        if (ammoPrimary) {
+          if (combat.isReloading) {
+            ammoPrimary.innerHTML = `<span style="font-size: 11px; color: #ffaa00;">RELOAD</span>`;
           } else {
-            ammoCount.classList.remove('ammo-low');
+            ammoPrimary.innerHTML = `${combat.ammo}<span class="ammo-slash">/</span>${combat.maxAmmo}`;
           }
         }
 
-        if (reloadBar) {
+        if (ammoSecondary) {
+          const secAmmo = (combat.playerSecondaryAmmo !== undefined) ? combat.playerSecondaryAmmo : (combat.secondaryAmmo || 8);
+          const maxSec = combat.maxSecondaryAmmo || 8;
+          ammoSecondary.innerHTML = `${secAmmo}<span class="ammo-slash">/</span>${maxSec}`;
+        }
+
+        if (reloadWrapLeft && reloadFillLeft) {
           if (combat.isReloading) {
-            reloadBar.parentElement.style.display = 'block';
+            reloadWrapLeft.style.display = 'block';
             const rPct = 100 - (combat.reloadTimer / combat.maxReloadTime) * 100;
-            reloadBar.style.width = `${rPct}%`;
+            reloadFillLeft.style.width = `${rPct}%`;
           } else {
-            reloadBar.parentElement.style.display = 'none';
+            reloadWrapLeft.style.display = 'none';
           }
         }
       }

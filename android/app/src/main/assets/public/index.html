@@ -921,45 +921,68 @@
       <span class="countdown-sub">PREPARE FOR BATTLE</span>
     </div>
 
-    <!-- Top HUD Bar: Minimap, Scores & Kill Feed -->
-    <div id="hud-top-bar">
-      <!-- 2D Radar Minimap -->
-      <div id="hud-minimap-container">
-        <canvas id="hud-minimap-canvas" width="114" height="114"></canvas>
-      </div>
-
-      <!-- Match Timer & Scores -->
-      <div id="hud-match-score">
-        <div class="hud-score-row">
-          <span class="score-team score-blue">BLUE <span id="score-blue">00</span></span>
-          <span id="hud-match-timer">05:00</span>
-          <span class="score-team score-red"><span id="score-red">00</span> RED</span>
+    <!-- Top HUD Bar: Minimap, Dual-Wing Squad Scoreboard & Event Feed -->
+    <div id="hud-top-bar" class="ma-hud-top-bar">
+      <!-- 2D Radar Minimap with Holo Frame & Stats -->
+      <div id="hud-minimap-container" class="ma-minimap-wrap">
+        <div class="ma-minimap-header">
+          <button class="ma-btn-esc" id="btn-battle-leave" title="Exit Battle / Settings">⚙ ESC</button>
+          <div class="ma-net-stats">
+            <span id="dbg-fps">60fps</span> <span id="dbg-ping">35ms</span>
+          </div>
         </div>
-
-        <!-- Domination Zone Badges -->
-        <div id="hud-domination-bar" style="display: none;">
-          <div class="zone-badge status-neutral" id="zone-badge-a">A</div>
-          <div class="zone-badge status-neutral" id="zone-badge-b">B</div>
-          <div class="zone-badge status-neutral" id="zone-badge-c">C</div>
-        </div>
-
-        <!-- Control Point Indicator -->
-        <div id="hud-controlpoint-bar" style="display: none;">
-          <span class="cp-label">SECTOR:</span>
-          <span class="cp-sector-val" id="cp-sector-val">CENTER</span>
-          <span class="cp-status-badge status-neutral" id="cp-status-val">NEUTRAL</span>
+        <div class="ma-minimap-holo-border">
+          <canvas id="hud-minimap-canvas" width="120" height="130"></canvas>
         </div>
       </div>
 
-      <!-- Controls Toggle & Kill Feed -->
-      <div id="hud-top-right">
-        <button class="btn-pill-small" id="btn-toggle-touch" title="Toggle Touch UI">📱 TOUCH UI</button>
-        <button class="btn-pill-small" id="btn-battle-leave" title="Leave Battle">🚪 GARAGE</button>
-        <div id="kill-feed-container"></div>
+      <!-- Center: Dual-Wing Squad Scoreboard & Control Points -->
+      <div id="hud-match-score" class="ma-score-header">
+        <!-- Blue Squad Wing -->
+        <div class="squad-wing blue-wing">
+          <div class="squad-helmets blue-helmets" id="blue-squad-helmets">
+            <span class="squad-helmet active"></span>
+            <span class="squad-helmet active"></span>
+            <span class="squad-helmet active"></span>
+            <span class="squad-helmet active"></span>
+            <span class="squad-helmet active"></span>
+          </div>
+          <span class="wing-score blue-score-val" id="score-blue">2</span>
+        </div>
+
+        <!-- Center Hex Control Points & Countdown Timer -->
+        <div class="squad-center-hexes">
+          <div class="hex-cp-row" id="hud-domination-bar">
+            <div class="hex-cp hex-cp-a status-blue" id="zone-badge-a"><span class="hex-text">A</span></div>
+            <div class="hex-cp hex-cp-b status-red" id="zone-badge-b"><span class="hex-text">B</span></div>
+            <div class="hex-cp hex-cp-c status-red" id="zone-badge-c"><span class="hex-text">C</span></div>
+          </div>
+          <div class="ma-match-timer-pill" id="hud-match-timer">⏱ 4:39</div>
+        </div>
+
+        <!-- Red Squad Wing -->
+        <div class="squad-wing red-wing">
+          <span class="wing-score red-score-val" id="score-red">3</span>
+          <div class="squad-helmets red-helmets" id="red-squad-helmets">
+            <span class="squad-helmet active red"></span>
+            <span class="squad-helmet active red"></span>
+            <span class="squad-helmet active red"></span>
+            <span class="squad-helmet active red"></span>
+            <span class="squad-helmet active red"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Right: Kill Feed & Quick Toggles -->
+      <div id="hud-top-right" class="ma-top-right-wrap">
+        <div class="ma-top-actions">
+          <button class="btn-pill-small ma-pill-sm" id="btn-toggle-touch" title="Toggle Controls">📱 TOUCH</button>
+        </div>
+        <div id="kill-feed-container" class="ma-kill-feed"></div>
       </div>
     </div>
 
-    <!-- Mode Announcement Banner (Killstreaks, Zone Captures, Rotation Alerts) -->
+    <!-- Mode Announcement Banner -->
     <div id="objective-announcement-banner" class="announcement-banner" style="display: none;"></div>
 
     <!-- Death Screen & Spectator Killer Cam HUD -->
@@ -979,64 +1002,112 @@
       </div>
     </div>
 
-    <!-- Player Status Card (HP, Shield, Ammo) -->
-    <div id="hud-player-status">
-      <div class="hud-mech-name" id="hud-player-name">IRONCLAD-X1</div>
-      <div class="hud-bar-wrap" title="Shield Integrity">
-        <div class="hud-bar shield-bar" id="hud-shield-bar" style="width: 100%;"></div>
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- ── BOTTOM COMBAT CONSOLE (Exact Mech Arena Architecture) ── -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="hud-combat-footer" class="ma-combat-footer">
+      <!-- Left Weapon Tray (Primary Weapon) -->
+      <div class="ma-weapon-pod wep-pod-left" id="hud-weapon-left">
+        <div class="wep-icon-wrap"><span class="wep-glyph">⚡</span></div>
+        <div class="wep-ammo-wrap">
+          <span class="wep-ammo-val" id="hud-ammo-primary-val">28<span class="ammo-slash">/</span>28</span>
+          <span class="wep-link-icon">🔗</span>
+        </div>
+        <div class="wep-hotkey-hint">LMB · Q - RELOAD</div>
+        <div class="wep-reload-bar-track" id="hud-reload-wrap-left" style="display: none;">
+          <div class="wep-reload-bar-fill" id="hud-reload-fill-left"></div>
+        </div>
       </div>
-      <div class="hud-bar-wrap" title="Hull Integrity">
-        <div class="hud-bar hp-bar" id="hud-hp-bar" style="width: 100%;"></div>
+
+      <!-- Center Cockpit Hull Console (Health & Shield) -->
+      <div class="ma-cockpit-console" id="hud-player-status">
+        <div class="cockpit-brand-badge">
+          <span class="brand-glyph">IT</span>
+        </div>
+        <div class="cockpit-bars-col">
+          <div class="cockpit-shield-track" title="Energy Shield">
+            <div class="cockpit-shield-fill" id="hud-shield-bar" style="width: 100%;"></div>
+          </div>
+          <div class="cockpit-hp-track" title="Chassis Hull Integrity">
+            <div class="cockpit-hp-fill" id="hud-hp-bar" style="width: 100%;"></div>
+          </div>
+          <div class="cockpit-meta-row">
+            <span class="cockpit-mech-label" id="hud-player-name">IRONCLAD-X1</span>
+          </div>
+        </div>
+        <div class="cockpit-numeric-wrap">
+          <span class="cockpit-hp-numeric" id="hud-hp-numeric">52.3k</span>
+        </div>
+        <!-- Hidden elements preserved for compatibility -->
+        <span id="hud-ammo-count" style="display: none;">28/28</span>
+        <div id="hud-reload-progress" style="display: none;"></div>
       </div>
-      <div class="hud-ammo-wrap">
-        <span id="hud-ammo-label">PRIMARY WEAPON</span>
-        <span id="hud-ammo-count">28 / 28</span>
-      </div>
-      <div class="hud-reload-wrap">
-        <div id="hud-reload-progress"></div>
+
+      <!-- Right Weapon Tray (Secondary Weapon) -->
+      <div class="ma-weapon-pod wep-pod-right" id="hud-weapon-right">
+        <div class="wep-ammo-wrap">
+          <span class="wep-link-icon">🔗</span>
+          <span class="wep-ammo-val" id="hud-ammo-secondary-val">8<span class="ammo-slash">/</span>8</span>
+        </div>
+        <div class="wep-icon-wrap"><span class="wep-glyph">💥</span></div>
+        <div class="wep-hotkey-hint">RMB · E - RELOAD</div>
+        <div class="wep-reload-bar-track" id="hud-reload-wrap-right" style="display: none;">
+          <div class="wep-reload-bar-fill" id="hud-reload-fill-right"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Virtual Joystick (Mobile) -->
-    <div id="joystick-zone">
-      <div id="joystick-base">
-        <div id="joystick-knob"></div>
+    <!-- Virtual Joystick (Mobile - Left Thumb) -->
+    <div id="joystick-zone" class="ma-joystick-zone">
+      <div id="joystick-base" class="ma-joystick-base">
+        <div class="joystick-outer-ring"></div>
+        <div id="joystick-knob" class="ma-joystick-knob"></div>
       </div>
     </div>
 
-    <!-- Mobile Action Buttons Panel -->
-    <div id="touch-action-panel">
-      <div class="action-row">
+    <!-- Left Ability Quick Action Button (Thruster / Jump) -->
+    <div class="ma-left-action-cluster">
+      <button class="ma-ability-circle-btn" id="btn-thruster-touch" aria-label="Thrusters">
+        <span class="circle-btn-glyph">⏫</span>
+        <span class="circle-btn-key">SHIFT</span>
+      </button>
+    </div>
+
+    <!-- Mobile Action Buttons Panel (Right Side) -->
+    <div id="touch-action-panel" class="ma-touch-action-panel">
+      <div class="ma-aux-action-row">
         <!-- Target Lock -->
-        <button class="touch-btn" id="btn-lock-touch" aria-label="Target Lock">
+        <button class="touch-btn ma-btn-aux" id="btn-lock-touch" aria-label="Target Lock">
           <span class="touch-btn-icon">🎯</span>
           <span class="touch-btn-label">Lock</span>
         </button>
 
         <!-- Reload -->
-        <button class="touch-btn" id="btn-reload-touch" aria-label="Reload Weapon">
+        <button class="touch-btn ma-btn-aux" id="btn-reload-touch" aria-label="Reload Weapon">
           <span class="touch-btn-icon">🔄</span>
           <span class="touch-btn-label">Reload</span>
         </button>
 
         <!-- Secondary Weapon -->
-        <button class="touch-btn" id="btn-secondary-touch" aria-label="Secondary Weapon">
+        <button class="touch-btn ma-btn-aux" id="btn-secondary-touch" aria-label="Secondary Weapon">
           <span class="touch-btn-icon">💥</span>
           <span class="touch-btn-label">Alt</span>
         </button>
-
-        <!-- Special Ability -->
-        <button class="touch-btn" id="btn-ability-touch" aria-label="Special Ability">
-          <span class="touch-btn-icon" id="ability-cd-text">⚡</span>
-          <span class="touch-btn-label">Ability</span>
-        </button>
       </div>
 
-      <div class="action-row">
-        <!-- Primary Fire Button -->
-        <button class="touch-btn" id="btn-fire-touch" aria-label="Primary Fire">
+      <div class="ma-main-action-row">
+        <!-- Special Ability (Large Cyber Circle) -->
+        <button class="touch-btn ma-btn-ability" id="btn-ability-touch" aria-label="Special Ability">
+          <div class="ability-cyber-ring"></div>
+          <span class="touch-btn-icon" id="ability-cd-text">⚡</span>
+          <span class="circle-btn-key">SPACE</span>
+        </button>
+
+        <!-- Primary Fire Button (Large Red Trigger) -->
+        <button class="touch-btn ma-btn-fire" id="btn-fire-touch" aria-label="Primary Fire">
+          <div class="fire-pulse-ring"></div>
           <span class="touch-btn-icon">🔥</span>
-          <span class="touch-btn-label">Fire</span>
+          <span class="touch-btn-label">FIRE</span>
         </button>
       </div>
     </div>

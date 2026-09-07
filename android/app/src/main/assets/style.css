@@ -171,30 +171,75 @@ html, body {
   transform-origin: 14px 95px;
 }
 
-/* ── Top Bar: Minimap, Match Scores & Timer ── */
-#hud-top-bar {
+/* ═══════════════════════════════════════════════════════════════
+   AAA MECH ARENA COMBAT HUD (Top Scoreboard, Cockpit & Trays)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Top Bar: Dual-Wing Scoreboard, Minimap & Event Feed ── */
+#hud-top-bar.ma-hud-top-bar {
   position: fixed;
-  top: env(safe-area-inset-top, 12px);
+  top: env(safe-area-inset-top, 8px);
   left: env(safe-area-inset-left, 16px);
   right: env(safe-area-inset-right, 16px);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   pointer-events: none;
-  z-index: 30;
+  z-index: 50;
 }
 
-/* Radar Minimap (Top Left) */
-#hud-minimap-container {
-  width: 114px;
-  height: 114px;
-  background: rgba(8, 12, 22, 0.85);
-  border: 1.5px solid rgba(0, 240, 255, 0.4);
-  border-radius: 8px;
-  padding: 2px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+/* 1. Tactical Radar Minimap (Top Left) */
+.ma-minimap-wrap {
+  width: 124px;
+  background: rgba(6, 10, 20, 0.88);
+  border: 1.5px solid rgba(0, 240, 255, 0.5);
+  border-radius: 6px;
+  padding: 4px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25), inset 0 0 10px rgba(0, 240, 255, 0.08);
   pointer-events: auto;
+}
+
+.ma-minimap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+  padding: 0 2px;
+}
+
+.ma-btn-esc {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #cbd5e1;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.ma-btn-esc:hover {
+  color: #00f0ff;
+  border-color: #00f0ff;
+}
+
+.ma-net-stats {
+  font-family: monospace;
+  font-size: 9px;
+  font-weight: 800;
+  color: #00f0ff;
+  letter-spacing: 0.5px;
+}
+
+.ma-minimap-holo-border {
+  width: 100%;
+  height: 110px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 40, 70, 0.4) 0%, rgba(5, 12, 24, 0.9) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.2);
 }
 
 #hud-minimap-canvas {
@@ -203,133 +248,358 @@ html, body {
   display: block;
 }
 
-/* Team Scores & Timer (Top Center) */
-#hud-match-score {
+/* 2. Dual-Wing Angled Scoreboard Header (Top Center) */
+.ma-score-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: rgba(10, 14, 26, 0.88);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  padding: 6px 20px;
-  backdrop-filter: blur(8px);
+  justify-content: center;
+  pointer-events: auto;
+  margin-top: 2px;
+  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.6));
 }
 
-.score-team {
-  font-size: 16px;
+.squad-wing {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.blue-wing {
+  background: linear-gradient(135deg, rgba(14, 80, 160, 0.92) 0%, rgba(8, 42, 90, 0.88) 100%);
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 0% 100%);
+  border-bottom: 2px solid #00f0ff;
+  padding-right: 22px;
+  box-shadow: 0 4px 16px rgba(0, 150, 255, 0.35);
+}
+
+.red-wing {
+  background: linear-gradient(225deg, rgba(180, 25, 40, 0.92) 0%, rgba(100, 12, 22, 0.88) 100%);
+  clip-path: polygon(12% 0, 100% 0, 100% 100%, 0% 100%);
+  border-bottom: 2px solid #ff3344;
+  padding-left: 22px;
+  box-shadow: 0 4px 16px rgba(255, 50, 50, 0.35);
+}
+
+.wing-score {
+  font-size: 22px;
   font-weight: 900;
   letter-spacing: 1px;
 }
 
-.score-blue { color: #00f0ff; text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
-.score-red { color: #ff3344; text-shadow: 0 0 8px rgba(255, 51, 68, 0.6); }
-
-#hud-match-timer {
-  font-size: 15px;
-  font-weight: 700;
-  color: #f1f5f9;
+.blue-score-val {
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff;
 }
 
-/* Dev Options / Controls Toggle (Top Right) */
-#hud-top-right {
+.red-score-val {
+  color: #ff3344;
+  text-shadow: 0 0 10px #ff3344;
+}
+
+.squad-helmets {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 4px;
+}
+
+.squad-helmet {
+  width: 14px;
+  height: 14px;
+  clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 20% 100%, 0% 35%);
+  background: #00f0ff;
+  box-shadow: 0 0 6px #00f0ff;
+  opacity: 0.9;
+  transition: all 0.2s;
+}
+
+.squad-helmet.red {
+  background: #ff3344;
+  box-shadow: 0 0 6px #ff3344;
+}
+
+.squad-helmet.dead {
+  background: #334155;
+  box-shadow: none;
+  opacity: 0.25;
+}
+
+/* Center Hexagon Control Points & Match Timer */
+.squad-center-hexes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 -4px;
+  z-index: 52;
+}
+
+.hex-cp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hex-cp {
+  width: 28px;
+  height: 26px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.hex-cp.status-blue {
+  background: #00c8ff;
+  box-shadow: 0 0 12px #00c8ff;
+}
+
+.hex-cp.status-red {
+  background: #ff3344;
+  box-shadow: 0 0 12px #ff3344;
+}
+
+.hex-cp.status-neutral {
+  background: #475569;
+}
+
+.ma-match-timer-pill {
+  margin-top: 4px;
+  background: rgba(8, 12, 22, 0.92);
+  border: 1.5px solid rgba(0, 240, 255, 0.4);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* 3. Top Right Actions & Kill Feed */
+.ma-top-right-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
   pointer-events: auto;
 }
 
-.btn-pill-small {
+.ma-top-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.ma-pill-sm {
   background: rgba(15, 22, 38, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 240, 255, 0.3);
   color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 12px;
-  padding: 6px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 4px 10px;
   cursor: pointer;
 }
 
-.btn-pill-small:hover {
-  color: #00f0ff;
-  border-color: #00f0ff;
-}
-
-/* ── Player Status Card & Ammo (Bottom Left) ── */
-#hud-player-status {
-  position: fixed;
-  bottom: calc(env(safe-area-inset-bottom, 16px) + 160px);
-  left: env(safe-area-inset-left, 24px);
-  width: 220px;
-  background: rgba(10, 14, 24, 0.85);
-  border: 1.5px solid rgba(0, 240, 255, 0.35);
-  border-radius: 8px;
-  padding: 10px 14px;
-  backdrop-filter: blur(6px);
-  pointer-events: none;
-  z-index: 25;
-}
-
-.hud-mech-name {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: #ffffff;
-  margin-bottom: 6px;
-}
-
-.hud-bar-wrap {
-  width: 100%;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 5px;
-}
-
-.hud-bar { height: 100%; transition: width 0.15s ease-out; }
-.shield-bar { background: linear-gradient(90deg, #0088ff, #00f0ff); }
-.hp-bar { background: linear-gradient(90deg, #00bb66, #00ff88); }
-
-.hud-ammo-wrap {
+.ma-kill-feed {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  color: #94a3b8;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 260px;
 }
 
-#hud-ammo-count {
+/* ═══════════════════════════════════════════════════════════════
+   BOTTOM COMBAT FOOTER (Cockpit Health Console & Weapon Pods)
+   ═══════════════════════════════════════════════════════════════ */
+.ma-combat-footer {
+  position: fixed;
+  bottom: env(safe-area-inset-bottom, 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 45;
+  width: auto;
+}
+
+/* Center Cockpit Health & Shield Console */
+.ma-cockpit-console {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(180deg, rgba(14, 22, 38, 0.95) 0%, rgba(6, 10, 18, 0.98) 100%);
+  border: 1.5px solid rgba(0, 240, 255, 0.5);
+  border-radius: 8px;
+  clip-path: polygon(14px 0%, calc(100% - 14px) 0%, 100% 100%, 0% 100%);
+  padding: 8px 18px 8px 22px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.75), 0 0 16px rgba(0, 240, 255, 0.25);
+  min-width: 290px;
+  pointer-events: auto;
+}
+
+.cockpit-brand-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #00f0ff 0%, #0066cc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
   font-weight: 900;
+  color: #040812;
+  box-shadow: 0 0 10px #00f0ff;
+}
+
+.cockpit-bars-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.cockpit-shield-track {
+  height: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.cockpit-shield-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffffff 0%, #00f0ff 100%);
+  box-shadow: 0 0 8px #00f0ff;
+  transition: width 0.15s ease-out;
+}
+
+.cockpit-hp-track {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.cockpit-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00e676 0%, #00ff88 60%, #b9f6ca 100%);
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.7);
+  transition: width 0.15s ease-out;
+}
+
+.cockpit-mech-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.cockpit-numeric-wrap {
+  font-size: 17px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+  font-family: monospace;
+}
+
+/* Symmetrical Weapon Trays */
+.ma-weapon-pod {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 16, 28, 0.9);
+  border: 1.5px solid rgba(0, 240, 255, 0.4);
+  border-radius: 8px;
+  padding: 6px 14px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  min-width: 120px;
+}
+
+.wep-pod-left {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+
+.wep-pod-right {
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.wep-ammo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wep-ammo-val {
+  font-size: 17px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+.ammo-slash {
+  color: #00f0ff;
+  font-size: 13px;
+  margin: 0 1px;
+}
+
+.wep-glyph {
+  font-size: 16px;
+}
+
+.wep-link-icon {
+  font-size: 10px;
   color: #00f0ff;
 }
 
-#hud-ammo-count.ammo-low {
-  color: #ffaa00;
+.wep-hotkey-hint {
+  font-size: 8px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
-.hud-reload-wrap {
-  display: none;
+.wep-reload-bar-track {
   width: 100%;
-  height: 4px;
+  height: 3px;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 2px;
   overflow: hidden;
   margin-top: 4px;
 }
 
-#hud-reload-progress {
+.wep-reload-bar-fill {
   height: 100%;
   width: 0%;
-  background: #ffaa00;
+  background: #00f0ff;
+  box-shadow: 0 0 6px #00f0ff;
 }
 
-/* ── Mobile Virtual Joystick (Bottom Left) ── */
-#joystick-zone {
+/* ═══════════════════════════════════════════════════════════════
+   ACTION TOUCH BUTTONS & JOYSTICK
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Virtual Joystick (Left) */
+.ma-joystick-zone {
   position: fixed;
   bottom: env(safe-area-inset-bottom, 16px);
   left: env(safe-area-inset-left, 24px);
-  width: 150px;
-  height: 150px;
+  width: 140px;
+  height: 140px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,31 +607,74 @@ html, body {
   z-index: 40;
 }
 
-#joystick-base {
-  width: 120px;
-  height: 120px;
+.ma-joystick-base {
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 240, 255, 0.14) 0%, rgba(14, 18, 28, 0.65) 80%);
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, rgba(14, 18, 28, 0.7) 80%);
   border: 2px solid rgba(0, 240, 255, 0.4);
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 
-#joystick-knob {
-  width: 48px;
-  height: 48px;
+.ma-joystick-knob {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #ffffff 0%, #7db9ff 60%, #1e60c4 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 8px rgba(0, 240, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 240, 255, 0.8);
   position: absolute;
   pointer-events: none;
 }
 
-/* ── Mobile Action Buttons Panel (Bottom Right) ── */
-#touch-action-panel {
+/* Left Quick Action Cluster (Thruster / Jump) */
+.ma-left-action-cluster {
+  position: fixed;
+  bottom: env(safe-area-inset-bottom, 24px);
+  left: calc(env(safe-area-inset-left, 24px) + 145px);
+  z-index: 40;
+  pointer-events: auto;
+}
+
+.ma-ability-circle-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 140, 255, 0.25) 0%, rgba(8, 24, 48, 0.9) 100%);
+  border: 2px solid #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  color: #fff;
+  transition: transform 0.08s;
+}
+
+.ma-ability-circle-btn:active {
+  transform: scale(0.92);
+}
+
+.circle-btn-glyph {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.circle-btn-key {
+  font-size: 8px;
+  font-weight: 900;
+  color: #00f0ff;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
+}
+
+/* Mobile Action Buttons Panel (Right Side) */
+.ma-touch-action-panel {
   position: fixed;
   bottom: env(safe-area-inset-bottom, 16px);
   right: env(safe-area-inset-right, 24px);
@@ -369,18 +682,25 @@ html, body {
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
-  pointer-events: none;
+  pointer-events: none !important;
   z-index: 40;
 }
 
-.action-row {
+.ma-aux-action-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.ma-main-action-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  pointer-events: none;
 }
 
 .touch-btn {
-  border-radius: 50%;
   border: none;
   color: #ffffff;
   font-family: inherit;
@@ -389,9 +709,9 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  pointer-events: auto;
+  pointer-events: auto !important;
   touch-action: none;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65);
   transition: transform 0.08s ease, filter 0.08s ease;
 }
 
@@ -399,84 +719,66 @@ html, body {
   transform: scale(0.92);
 }
 
-.touch-btn-icon {
-  font-size: 22px;
-  line-height: 1;
+.ma-btn-aux {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2a3b52 0%, #131c28 75%, #0a0f16 100%);
+  border: 1.5px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
-.touch-btn-label {
-  font-size: 9px;
+.ma-btn-aux .touch-btn-icon {
+  font-size: 18px;
+}
+
+.ma-btn-aux .touch-btn-label {
+  font-size: 8px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
+  color: #cbd5e1;
 }
 
-/* Fire Button (Large) */
-#btn-fire-touch {
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle at 35% 35%, #ff7722 0%, #d42200 65%, #881100 100%);
-  border: 2.5px solid #ff9955;
-  box-shadow: 0 0 20px rgba(255, 68, 0, 0.5), 0 6px 18px rgba(0, 0, 0, 0.6);
+/* Special Ability (Large Cyber Circle) */
+.ma-btn-ability {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(0, 240, 255, 0.35) 0%, rgba(10, 24, 46, 0.95) 100%);
+  border: 2.5px solid #00f0ff;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6), inset 0 0 12px rgba(0, 240, 255, 0.3);
+  position: relative;
 }
 
-#btn-fire-touch .touch-btn-icon { font-size: 28px; }
-
-/* Ability Button */
-#btn-ability-touch {
-  width: 58px;
-  height: 58px;
-  background: radial-gradient(circle at 35% 35%, #bf55ec 0%, #8e24aa 65%, #4a148c 100%);
-  border: 2px solid #e192ff;
-  box-shadow: 0 0 14px rgba(190, 85, 236, 0.4);
-}
-
-#btn-ability-touch.cooling {
+.ma-btn-ability.cooling {
   opacity: 0.55;
   filter: grayscale(0.6);
 }
 
-#btn-ability-touch.active-boost {
-  border-color: #00f0ff;
-  box-shadow: 0 0 20px #00f0ff;
+.ma-btn-ability .touch-btn-icon {
+  font-size: 24px;
 }
 
-/* Secondary Weapon Button */
-#btn-secondary-touch {
-  width: 56px;
-  height: 56px;
-  background: radial-gradient(circle at 35% 35%, #00e1d9 0%, #008fa8 65%, #005161 100%);
-  border: 2px solid #66f4ff;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+/* Primary Fire Button (Large Red Trigger) */
+.ma-btn-fire {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff4d22 0%, #c61a00 65%, #7a0800 100%);
+  border: 3px solid #ff7744;
+  box-shadow: 0 0 24px rgba(255, 77, 34, 0.65), 0 6px 18px rgba(0, 0, 0, 0.7);
 }
 
-/* Reload Button */
-#btn-reload-touch {
-  width: 50px;
-  height: 50px;
-  background: radial-gradient(circle at 35% 35%, #475569 0%, #1e293b 70%, #0f172a 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
+.ma-btn-fire .touch-btn-icon {
+  font-size: 30px;
 }
 
-#btn-reload-touch.urgent {
-  border-color: #ffaa00;
-  box-shadow: 0 0 14px rgba(255, 170, 0, 0.5);
-  animation: pulseReload 0.8s infinite alternate;
+.ma-btn-fire .touch-btn-label {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
-@keyframes pulseReload {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.08); }
-}
-
-/* Target Lock Button */
-#btn-lock-touch {
-  width: 48px;
-  height: 48px;
-  background: radial-gradient(circle at 35% 35%, #334155 0%, #1e293b 70%, #0f172a 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-}
 
 #btn-lock-touch.locked {
   border-color: #ff3344;
