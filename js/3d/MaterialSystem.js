@@ -89,63 +89,61 @@ window.IT = window.IT || {};
       const darkMetalColor = 0x14161a;
       const lightMetalColor = 0x8892a0;
 
-      // 1. ARMOR (Composite Hull Plates)
+      // 1. ARMOR (Composite Hull Plates - Dark Gunmetal / Slate Navy)
       const armor = new THREE.MeshStandardMaterial({
-        color: armorColor,
-        roughness: 0.38,
-        metalness: 0.72,
+        color: 0x181f2c,
+        roughness: 0.32,
+        metalness: 0.82,
         name: `mat_armor_${team}`
       });
 
       // 2. ARMOR ACCENT (Upper Pauldrons & Mantlet Plates)
       const armorAccent = new THREE.MeshStandardMaterial({
-        color: plateColor,
-        roughness: 0.32,
-        metalness: 0.78,
+        color: 0x121722,
+        roughness: 0.28,
+        metalness: 0.86,
         name: `mat_armor_accent_${team}`
       });
 
       // 3. DARK METAL (Structural Endoskeleton, Joints, Spine)
       const darkMetal = new THREE.MeshStandardMaterial({
-        color: darkMetalColor,
-        roughness: 0.65,
-        metalness: 0.88,
+        color: 0x0c0f16,
+        roughness: 0.55,
+        metalness: 0.92,
         name: 'mat_dark_metal'
       });
 
       // 4. LIGHT METAL / CHROME (Pistons, Shock Absorbers, Actuator Rods)
       const lightMetal = new THREE.MeshStandardMaterial({
-        color: lightMetalColor,
-        roughness: 0.18,
-        metalness: 0.95,
+        color: 0x94a3b8,
+        roughness: 0.16,
+        metalness: 0.96,
         name: 'mat_light_metal'
       });
 
       // 5. HYDRAULIC CHROME (Mirror piston shafts)
       const hydraulic = new THREE.MeshStandardMaterial({
-        color: 0xdde4ec,
-        roughness: 0.12,
+        color: 0xe2e8f0,
+        roughness: 0.08,
         metalness: 0.98,
         name: 'mat_hydraulic'
       });
 
       // 6. RUBBER (Hydraulic conduits, flexible cable bundles)
       const rubber = new THREE.MeshStandardMaterial({
-        color: 0x111214,
-        roughness: 0.85,
-        metalness: 0.10,
+        color: 0x0a0c10,
+        roughness: 0.90,
+        metalness: 0.08,
         name: 'mat_rubber'
       });
 
-      // 7. GLASS / SENSOR VISOR (Reflective optical sensor array)
+      // 7. GLASS / SENSOR VISOR (Iconic Glowing Crimson Slit Visor)
       const visor = new THREE.MeshStandardMaterial({
-        color: 0x05080c,
-        emissive: colors.primary,
-        emissiveIntensity: 2.2,
-        roughness: 0.08,
-        metalness: 0.92,
-        transparent: true,
-        opacity: 0.92,
+        color: 0x000000,
+        emissive: 0xff0028,
+        emissiveIntensity: 5.0,
+        roughness: 0.1,
+        metalness: 0.1,
         name: `mat_visor_${team}`
       });
 
@@ -153,8 +151,8 @@ window.IT = window.IT || {};
       const energy = new THREE.MeshStandardMaterial({
         color: 0x081018,
         emissive: colors.primary,
-        emissiveIntensity: 2.0,
-        roughness: 0.25,
+        emissiveIntensity: 2.5,
+        roughness: 0.20,
         metalness: 0.5,
         name: `mat_energy_${team}`
       });
@@ -162,29 +160,65 @@ window.IT = window.IT || {};
       // 9. EXHAUST / HEAT SINKS (Thruster bells and venting grills)
       const exhaust = new THREE.MeshStandardMaterial({
         color: 0x161616,
-        emissive: colors.accent,
-        emissiveIntensity: 1.4,
-        roughness: 0.45,
-        metalness: 0.7,
+        emissive: 0xff3300,
+        emissiveIntensity: 2.0,
+        roughness: 0.40,
+        metalness: 0.75,
         name: `mat_exhaust_${team}`
       });
 
       // 10. WEAPON METAL (Hardpoint mounting fixtures)
       const weaponMetal = new THREE.MeshStandardMaterial({
-        color: 0x1a1d24,
-        roughness: 0.40,
-        metalness: 0.85,
+        color: 0x161a22,
+        roughness: 0.35,
+        metalness: 0.90,
         name: 'mat_weapon_metal'
       });
 
       // 11. WEAK POINT (Rear reactor / Sensor Mast glow - subtle amber indicator)
       const weakPointCore = new THREE.MeshStandardMaterial({
-        color: 0x1a1005,
-        emissive: 0xff9900,
-        emissiveIntensity: 2.5,
+        color: 0x1a0800,
+        emissive: 0xff6600,
+        emissiveIntensity: 3.2,
         roughness: 0.2,
         metalness: 0.7,
         name: 'mat_weakpoint_core'
+      });
+
+      // 12. WHITE COMPOSITE (Crisp Alpine White Chamfered Armor Accents)
+      const whiteComposite = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.22,
+        metalness: 0.25,
+        name: 'mat_white_composite'
+      });
+
+      // 13. ELECTRIC BLUE ARMOR (Metallic Cobalt Blue Lower Shin Plating)
+      const electricBlueArmor = new THREE.MeshStandardMaterial({
+        color: 0x1d4ed8,
+        roughness: 0.28,
+        metalness: 0.85,
+        name: 'mat_electric_blue'
+      });
+
+      // 14. CRIMSON GLOW (Signature Neon Red Energy Channels & Knee Hub Rings)
+      const crimsonGlow = new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        emissive: 0xff0028,
+        emissiveIntensity: 4.8,
+        roughness: 0.1,
+        metalness: 0.1,
+        name: 'mat_crimson_glow'
+      });
+
+      // 15. CYAN GLOW (Dynamic Team Trim Conduit)
+      const cyanGlow = new THREE.MeshStandardMaterial({
+        color: 0x021822,
+        emissive: 0x00f0ff,
+        emissiveIntensity: 3.2,
+        roughness: 0.15,
+        metalness: 0.15,
+        name: 'mat_cyan_glow'
       });
 
       return {
@@ -199,6 +233,10 @@ window.IT = window.IT || {};
         exhaust,
         weaponMetal,
         weakPointCore,
+        whiteComposite,
+        electricBlueArmor,
+        crimsonGlow,
+        cyanGlow,
         teamColors: colors
       };
     }

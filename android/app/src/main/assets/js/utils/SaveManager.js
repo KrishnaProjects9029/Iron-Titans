@@ -264,7 +264,16 @@ window.IT = window.IT || {};
     get playerLevel() { return (this._data && this._data.playerLevel) || 1; }
     get playerXP() { return (this._data && this._data.playerXP) || 0; }
     get pilotName() { return (this._data && this._data.pilotName) || 'TITAN-PILOT'; }
+    get career() { return (this._data && this._data.career) || DEFAULT_SAVE.career; }
+    get preferredMode() { return (this._data && this._data.preferredMode) || DEFAULT_SAVE.preferredMode; }
+    get preferredArena() { return (this._data && this._data.preferredArena) || DEFAULT_SAVE.preferredArena; }
     get saveData() { return this._data; }
+
+    reset() {
+      this._data = JSON.parse(JSON.stringify(DEFAULT_SAVE));
+      this.save();
+      return this._data;
+    }
 
     // ── XP & Player Level ──
     getXPRequiredForLevel(level) {

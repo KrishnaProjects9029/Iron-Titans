@@ -1955,6 +1955,8 @@ html, body {
   justify-content: space-between;
   align-items: center;
   pointer-events: none;
+  margin-top: -14px;
+  margin-bottom: 28px;
 }
 
 .hangar-power-badge {

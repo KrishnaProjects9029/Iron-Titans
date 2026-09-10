@@ -75,6 +75,10 @@ const THREE = {
   CanvasTexture: class { constructor(){this.needsUpdate=false;} },
   MeshStandardMaterial: class { constructor(opts={}){this.color=opts.color;this.emissive={setHex:()=>{}};this.emissiveIntensity=opts.emissiveIntensity||0;} },
   MeshBasicMaterial: class { constructor(opts={}){this.color=opts.color;} },
+  LineBasicMaterial: class { constructor(opts={}){this.color=opts.color;} },
+  Line: class { constructor(){this.geometry={setFromPoints:()=>{}};this.position=new THREE.Vector3();} },
+  BufferGeometry: class { constructor(){this.setFromPoints=()=>{};this.attributes={};} setAttribute(name,attr){this.attributes[name]=attr;} getAttribute(name){return this.attributes[name] || {setXYZ:()=>{}}; } },
+  BufferAttribute: class { constructor(arr, size){this.array=arr;this.itemSize=size;this.needsUpdate=false;} setXYZ(){} },
   BoxGeometry: class {},
   CylinderGeometry: class {},
   ConeGeometry: class {},
@@ -98,6 +102,7 @@ global.THREE = THREE;
 require('../js/data/MechRegistry.js');
 require('../js/data/WeaponRegistry.js');
 require('../js/utils/SaveManager.js');
+require('../js/3d/MaterialSystem.js');
 require('../js/3d/WeaponBuilder3D.js');
 require('../js/3d/MechBuilder3D.js');
 require('../js/3d/Mech3D.js');
@@ -237,11 +242,11 @@ enemyB.position.set(4, 0, 10); // Within 8.5m AOE explosion radius!
 const enemyAStartShield = enemyA.shield;
 const enemyBStartShield = enemyB.shield;
 
-// Fire Plasma Launcher orb at (0, 0, 10)
-const plasmaOrb = new IT.Projectile3D(fakeScene, new THREE.Vector3(0, 2.5, 0), new THREE.Vector3(0, 2.5, 10), {
+// Fire Plasma Launcher orb at (0, 2.5, 10)
+const plasmaOrb = new IT.Projectile3D(fakeScene, 'PLASMA_ORB');
+plasmaOrb.init(new THREE.Vector3(0, 2.5, 0), new THREE.Vector3(0, 2.5, 10), {
   sourceMech: battleMech,
   team: 'blue',
-  type: 'PLASMA_ORB',
   damage: 110,
   speed: 80,
   explosionRadius: 8.5

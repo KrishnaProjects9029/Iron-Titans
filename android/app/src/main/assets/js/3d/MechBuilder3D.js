@@ -97,141 +97,318 @@ window.IT = window.IT || {};
       rig.muzzlePoints.push(secondaryWep.muzzlePoint);
     }
 
-    // ── 1. IRONCLAD-X1 (Tank) ──
+    // ── 1. IRONCLAD-X1 (Authentic AAA Mech Arena Combat Walker) ──
     static _buildIroncladChassis(m, isRed) {
       const root = new THREE.Group();
+      const whiteMat = m.whiteComposite || m.lightMetal;
+      const blueArmMat = m.electricBlueArmor || m.armorAccent;
+      const redGlow = m.crimsonGlow || m.energy;
+
+      // ── Pelvis & Turntable Waist ──
       const pelvisGroup = new THREE.Group();
-      pelvisGroup.position.set(0, 2.6, 0);
+      pelvisGroup.position.set(0, 2.68, 0);
       root.add(pelvisGroup);
 
-      // Heavy reinforced pelvis
-      const pelvisMesh = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.4), m.darkMetal);
+      // Heavy faceted pelvis frame
+      const pelvisMesh = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.72, 1.25), m.darkMetal);
       pelvisMesh.castShadow = true;
       pelvisGroup.add(pelvisMesh);
 
-      // Rotary mechanical waist ring
-      const waist = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.35, 16), m.darkMetal);
-      waist.position.set(0, 0.5, 0);
-      pelvisGroup.add(waist);
+      // Angled Groin Armor Shield
+      const groinShield = new THREE.Mesh(new THREE.BoxGeometry(1.12, 0.68, 0.48), m.armor);
+      groinShield.position.set(0, -0.12, 0.62);
+      groinShield.rotation.x = -Math.PI * 0.12;
+      groinShield.castShadow = true;
+      pelvisGroup.add(groinShield);
 
-      // Hydraulic waist stabilizer pistons
-      [-0.6, 0.6].forEach(wx => {
-        const piston = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.6, 8), m.hydraulic);
-        piston.position.set(wx, 0.3, 0.4);
+      // Alpine White Groin Strike Chevron
+      const groinChevron = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.35, 0.12), whiteMat);
+      groinChevron.position.set(0, -0.16, 0.88);
+      groinChevron.rotation.x = -Math.PI * 0.12;
+      pelvisGroup.add(groinChevron);
+
+      // Rotary mechanical waist ring (two-tier turret hub)
+      const waistUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.88, 0.95, 0.28, 20), m.darkMetal);
+      waistUpper.position.set(0, 0.45, 0);
+      pelvisGroup.add(waistUpper);
+
+      const waistLower = new THREE.Mesh(new THREE.CylinderGeometry(0.98, 1.05, 0.18, 20), m.darkMetal);
+      waistLower.position.set(0, 0.24, 0);
+      pelvisGroup.add(waistLower);
+
+      // Chrome waist hydraulic stabilizers
+      [-0.68, 0.68].forEach(wx => {
+        const piston = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.55, 8), m.hydraulic);
+        piston.position.set(wx, 0.32, 0.35);
         pelvisGroup.add(piston);
       });
 
-      // Torso Assembly
-      const torsoGroup = new THREE.Group();
-      torsoGroup.position.set(0, 0.6, 0);
-      pelvisGroup.add(torsoGroup);
+      // Symmetrical Rotary Hip Hubs with Glowing Red Ring
+      [-0.96, 0.96].forEach(hx => {
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.32, 16), m.darkMetal);
+        hub.rotation.z = Math.PI / 2;
+        hub.position.set(hx, -0.1, 0.04);
+        pelvisGroup.add(hub);
 
-      // Armored composite chest core
-      const chest = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.7, 2.0), m.armor);
-      chest.position.set(0, 0.95, 0);
-      chest.castShadow = true;
-      torsoGroup.add(chest);
-
-      // Sloped front reactive armor breastplate
-      const breastplate = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.2, 0.7), m.armorAccent);
-      breastplate.position.set(0, 1.05, 1.0);
-      breastplate.rotation.x = -Math.PI * 0.08;
-      breastplate.castShadow = true;
-      torsoGroup.add(breastplate);
-
-      // Team Energy Trim Strips on Torso Flanks
-      [-1.32, 1.32].forEach(tx => {
-        const strip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.1, 0.8), m.energy);
-        strip.position.set(tx, 1.0, 0.1);
-        torsoGroup.add(strip);
+        const hubRing = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.035, 8, 16), redGlow);
+        hubRing.rotation.y = Math.PI / 2;
+        hubRing.position.set(hx > 0 ? hx + 0.17 : hx - 0.17, -0.1, 0.04);
+        pelvisGroup.add(hubRing);
       });
 
-      // Head / Cockpit Sensor Pod with Weak Point detection
+      // ── Torso Assembly (Hunched athletic stance) ──
+      const torsoGroup = new THREE.Group();
+      torsoGroup.position.set(0, 0.55, 0);
+      torsoGroup.rotation.x = 0.08; // Hunched aggressive forward lean
+      pelvisGroup.add(torsoGroup);
+
+      // Muscular forward-canted chest core
+      const chestCore = new THREE.Mesh(new THREE.BoxGeometry(2.45, 1.65, 2.05), m.armor);
+      chestCore.position.set(0, 0.95, 0);
+      chestCore.castShadow = true;
+      torsoGroup.add(chestCore);
+
+      // High Armored Neck Collar / Cowl protecting head on flanks
+      [-1.05, 1.05].forEach(cx => {
+        const collarShield = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.85, 1.35), m.armor);
+        collarShield.position.set(cx, 1.55, 0.25);
+        collarShield.rotation.z = (cx > 0 ? 1 : -1) * -0.14;
+        collarShield.rotation.y = (cx > 0 ? 1 : -1) * 0.10;
+        collarShield.castShadow = true;
+        torsoGroup.add(collarShield);
+
+        // Alpine White Chamfered Collar Top Trim Plate
+        const collarTrim = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.65, 1.15), whiteMat);
+        collarTrim.position.set(cx > 0 ? cx + 0.14 : cx - 0.14, 1.75, 0.25);
+        collarTrim.rotation.z = (cx > 0 ? 1 : -1) * -0.14;
+        torsoGroup.add(collarTrim);
+      });
+
+      // Dual Symmetrical Angled Breastplates (Dark Gunmetal Hull Plates)
+      [-0.66, 0.66].forEach(bx => {
+        const bp = new THREE.Mesh(new THREE.BoxGeometry(1.02, 1.12, 0.48), m.armorAccent);
+        bp.position.set(bx, 0.85, 0.88);
+        bp.rotation.x = -0.24;
+        bp.rotation.y = (bx > 0 ? 1 : -1) * -0.14;
+        bp.castShadow = true;
+        torsoGroup.add(bp);
+
+        // Crisp White Composite Armor Trim on chest upper corners (accent line)
+        const bpWhite = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.14, 0.10), whiteMat);
+        bpWhite.position.set(bx, 1.25, 1.02);
+        bpWhite.rotation.x = -0.24;
+        bpWhite.rotation.y = (bx > 0 ? 1 : -1) * -0.14;
+        torsoGroup.add(bpWhite);
+      });
+
+      // Center Sternum Intake Grille with Glowing Crimson Slats
+      const intakeFrame = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.65, 0.18), m.darkMetal);
+      intakeFrame.position.set(0, 0.68, 1.04);
+      torsoGroup.add(intakeFrame);
+
+      [-0.10, 0.10].forEach(sy => {
+        const slat = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.08, 0.08), redGlow);
+        slat.position.set(0, 0.68 + sy, 1.14);
+        torsoGroup.add(slat);
+      });
+
+      // ── Head & Signature Crimson Angular Visor Pod (Front Center Focus) ──
       const headPod = new THREE.Group();
-      headPod.position.set(0, 1.8, 0.3);
+      headPod.position.set(0, 1.20, 0.72);
       torsoGroup.add(headPod);
 
-      const headArmor = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 0.8), m.armor);
-      headPod.add(headArmor);
+      // Angular Helmet Cowl
+      const headBase = new THREE.Mesh(new THREE.BoxGeometry(1.30, 0.52, 0.95), m.armor);
+      headPod.add(headBase);
 
-      // Sensor Visor (Weak Point: HEAD_SENSOR)
-      const visor = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.26, 0.3), m.visor);
-      visor.position.set(0, 0.05, 0.4);
-      visor.userData = { isWeakPoint: true, type: 'HEAD_SENSOR', multiplier: 1.5 };
-      headPod.add(visor);
+      // Angled Forehead Brow Wedge
+      const browWedge = new THREE.Mesh(new THREE.BoxGeometry(1.24, 0.30, 0.52), m.armorAccent);
+      browWedge.position.set(0, 0.22, 0.26);
+      browWedge.rotation.x = 0.25;
+      headPod.add(browWedge);
 
-      // Rear Reactor Core Housing & Cooling Radiator
-      const pack = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.4, 0.85), m.darkMetal);
+      // Forehead Crest Plate in Alpine White Composite
+      const browCrest = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.15, 0.44), whiteMat);
+      browCrest.position.set(0, 0.32, 0.25);
+      browCrest.rotation.x = 0.25;
+      headPod.add(browCrest);
+
+      // Bold Menacing Glowing Crimson Angular Visor (Center Slit + Winged Edges)
+      const visorCenter = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.18, 0.24), m.visor);
+      visorCenter.position.set(0, 0.02, 0.52);
+      visorCenter.userData = { isWeakPoint: true, type: 'HEAD_SENSOR', multiplier: 1.5 };
+      headPod.add(visorCenter);
+
+      [-0.50, 0.50].forEach(vx => {
+        const wing = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.15, 0.20), m.visor);
+        wing.position.set(vx, 0.08, 0.46);
+        wing.rotation.z = (vx > 0 ? -1 : 1) * 0.32;
+        wing.userData = { isWeakPoint: true, type: 'HEAD_SENSOR', multiplier: 1.5 };
+        headPod.add(wing);
+      });
+
+      // Dark Angular Chin / Jaw Plate
+      const chin = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.24, 0.50), m.darkMetal);
+      chin.position.set(0, -0.22, 0.36);
+      chin.rotation.x = -0.28;
+      headPod.add(chin);
+
+      // Symmetrical Cheek Armor Strike Plates
+      [-0.66, 0.66].forEach(cx => {
+        const cheek = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.38, 0.44), whiteMat);
+        cheek.position.set(cx, -0.04, 0.34);
+        cheek.rotation.y = (cx > 0 ? 1 : -1) * 0.28;
+        headPod.add(cheek);
+      });
+
+      // ── Rear Reactor Core Housing & Vernier Thrusters ──
+      const pack = new THREE.Mesh(new THREE.BoxGeometry(1.85, 1.35, 0.88), m.darkMetal);
       pack.position.set(0, 1.1, -1.25);
       pack.castShadow = true;
       torsoGroup.add(pack);
 
       // Rear Reactor Core (Weak Point: REAR_CORE)
-      const coreMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.8, 12), m.weakPointCore);
+      const coreMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.75, 16), m.weakPointCore);
       coreMesh.rotation.x = Math.PI / 2;
-      coreMesh.position.set(0, 1.1, -1.7);
+      coreMesh.position.set(0, 1.05, -1.72);
       coreMesh.userData = { isWeakPoint: true, type: 'REAR_CORE', multiplier: 1.75 };
       torsoGroup.add(coreMesh);
 
-      // Heat Dissipation Vent Gills
-      [-0.6, 0.6].forEach(gx => {
-        const vent = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.7, 0.2), m.exhaust);
-        vent.position.set(gx, 1.25, -1.7);
-        torsoGroup.add(vent);
+      // Twin Vernier Thrusters with glowing exhaust interior
+      [-0.65, 0.65].forEach(tx => {
+        const thruster = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.34, 1.1, 12), m.darkMetal);
+        thruster.position.set(tx, 1.38, -1.62);
+        thruster.rotation.x = -0.22;
+        thruster.castShadow = true;
+        torsoGroup.add(thruster);
+
+        const flameNozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.16, 12), m.exhaust);
+        flameNozzle.position.set(0, 0.52, 0);
+        thruster.add(flameNozzle);
       });
 
-      // Rubber Conduit Line linking reactor to torso
-      const cable = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.07, 6, 12, Math.PI), m.rubber);
+      // Rubber Conduit Line linking reactor to torso spine
+      const cable = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.08, 8, 16, Math.PI * 0.9), m.rubber);
       cable.rotation.y = Math.PI / 2;
-      cable.position.set(0, 0.8, -1.0);
+      cable.position.set(0, 0.72, -1.02);
       torsoGroup.add(cable);
 
-      // Arms & Weapon Hardpoints
+      // ── Arms & Massive Combat Gauntlet Weapon Pods (Raised Strike Stance) ──
       const arms = [];
       const weaponMounts = [];
 
       [-1, 1].forEach(side => {
         const armPivot = new THREE.Group();
-        armPivot.position.set(side * 1.65, 1.3, 0);
+        armPivot.position.set(side * 1.55, 1.25, 0.05);
+        armPivot.rotation.z = side * -0.22; // Flared up and out
+        armPivot.rotation.x = -0.26;       // Shoulders pulled back/up
         torsoGroup.add(armPivot);
 
-        // Shoulder joint rotary assembly
-        const shoulderJoint = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 12), m.darkMetal);
+        // Shoulder joint rotary ball
+        const shoulderJoint = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), m.darkMetal);
         armPivot.add(shoulderJoint);
 
-        // Heavy shoulder pauldron with armor bevel and team light
-        const pauldron = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.0, 1.5), m.armor);
-        pauldron.position.set(side * 0.18, 0.25, 0);
-        pauldron.rotation.z = side * -Math.PI * 0.08;
+        // Shoulder to Torso Hydraulic Piston
+        const shoulderPiston = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8), m.hydraulic);
+        shoulderPiston.position.set(side * -0.22, 0.08, 0.08);
+        armPivot.add(shoulderPiston);
+
+        // Heavy Shoulder Pauldron
+        const pauldron = new THREE.Mesh(new THREE.BoxGeometry(1.22, 1.12, 1.62), m.armor);
+        pauldron.position.set(side * 0.22, 0.26, 0);
+        pauldron.rotation.z = side * -Math.PI * 0.09;
         pauldron.castShadow = true;
         armPivot.add(pauldron);
 
-        // Shoulder team energy beacon
-        const beacon = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.1, 0.9), m.energy);
-        beacon.position.set(side * 0.7, 0.5, 0);
-        armPivot.add(beacon);
+        // Alpine White Chamfered Top Armor Plate on Pauldron
+        const pauldronWhite = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.22, 1.42), whiteMat);
+        pauldronWhite.position.set(side * 0.26, 0.86, 0);
+        pauldronWhite.rotation.z = side * -Math.PI * 0.09;
+        armPivot.add(pauldronWhite);
 
-        // Lower arm hydraulic strut
-        const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.85, 8), m.hydraulic);
-        strut.position.set(0, -0.5, 0);
-        armPivot.add(strut);
+        // Glowing Crimson Heat Vent Strip on Pauldron Outer Face
+        const pauldronGlow = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 1.08), redGlow);
+        pauldronGlow.position.set(side * 0.84, 0.32, 0);
+        armPivot.add(pauldronGlow);
 
-        // Armored forearm cowl
-        const forearm = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.7, 0.8), m.armorAccent);
-        forearm.position.set(0, -0.65, 0.2);
-        armPivot.add(forearm);
+        // Bicep Mechanical Framework & Chrome Pistons
+        const bicep = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.72, 0.52), m.darkMetal);
+        bicep.position.set(0, -0.42, 0.06);
+        armPivot.add(bicep);
 
-        // Weapon hardpoint socket
+        [-0.14, 0.14].forEach(px => {
+          const bpPiston = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.65, 8), m.hydraulic);
+          bpPiston.position.set(px, -0.42, -0.15);
+          armPivot.add(bpPiston);
+        });
+
+        // Elbow Joint Hinge with Glowing Red Core Hub
+        const elbow = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.58, 12), m.darkMetal);
+        elbow.rotation.z = Math.PI / 2;
+        elbow.position.set(0, -0.80, 0.12);
+        armPivot.add(elbow);
+
+        const elbowRing = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.03, 6, 14), redGlow);
+        elbowRing.rotation.y = Math.PI / 2;
+        elbowRing.position.set(side * 0.31, -0.80, 0.12);
+        armPivot.add(elbowRing);
+
+        // Forearm Group: Raised forward at 85° in ready-to-strike posture
+        const forearmGroup = new THREE.Group();
+        forearmGroup.position.set(0, -0.80, 0.16);
+        forearmGroup.rotation.x = 1.48; // Bent forward 85°
+        forearmGroup.rotation.y = side * -0.20; // Angled slightly inward toward center
+        armPivot.add(forearmGroup);
+
+        // Massive Heavy Combat Gauntlet Chassis
+        const gauntlet = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.80, 1.55), m.armor);
+        gauntlet.position.set(0, 0, 0.65);
+        gauntlet.castShadow = true;
+        forearmGroup.add(gauntlet);
+
+        // Alpine White Composite Strike Shield on Top Forearm
+        const gauntletWhite = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.18, 1.30), whiteMat);
+        gauntletWhite.position.set(0, 0.45, 0.65);
+        forearmGroup.add(gauntletWhite);
+
+        // Glowing Crimson Heat Channel along outer gauntlet flank
+        const gauntletGlow = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.18, 1.15), redGlow);
+        gauntletGlow.position.set(side * 0.45, 0.08, 0.68);
+        forearmGroup.add(gauntletGlow);
+
+        // Front Face Combat Fist & Dual Muzzle Bores
+        const fistCap = new THREE.Mesh(new THREE.BoxGeometry(0.80, 0.76, 0.24), m.darkMetal);
+        fistCap.position.set(0, 0, 1.46);
+        forearmGroup.add(fistCap);
+
+        // Dual Muzzle Ports
+        [-0.18, 0.18].forEach(my => {
+          const bore = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.24, 12), m.weaponMetal);
+          bore.rotation.x = Math.PI / 2;
+          bore.position.set(0, my, 1.56);
+          forearmGroup.add(bore);
+
+          const muzzleCore = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.25, 8), m.darkMetal);
+          muzzleCore.rotation.x = Math.PI / 2;
+          muzzleCore.position.set(0, my, 1.57);
+          forearmGroup.add(muzzleCore);
+        });
+
+        // Weapon Hardpoint Socket (mount sits flush atop the gauntlet)
         const mount = new THREE.Group();
-        mount.position.set(0, -1.0, 0.4);
-        armPivot.add(mount);
+        mount.position.set(0, 0.54, 0.70);
+        forearmGroup.add(mount);
 
         arms.push(armPivot);
         weaponMounts.push(mount);
       });
 
-      // Articulated Hydraulic Legs
-      const legs = MechBuilder3D._buildStandardLegs(pelvisGroup, m, { hipWidth: 1.0, thighW: 0.75, footW: 0.95 });
+      // ── Articulated Athletic Digitigrade Legs (Raptor Combat Stance) ──
+      const legs = MechBuilder3D._buildDigitigradeLegs(pelvisGroup, m, {
+        hipWidth: 1.05,
+        thighW: 0.72,
+        footW: 0.95
+      });
 
       return { root, pelvisGroup, torsoGroup, arms, weaponMounts, legs };
     }
@@ -640,59 +817,184 @@ window.IT = window.IT || {};
       return legs;
     }
 
-    // ── Helper: Digitigrade (Reverse-Joint) Raptor Legs for Vortex-9 ──
-    static _buildDigitigradeLegs(pelvisGroup, m) {
+    // ── Helper: Authentic AAA Digitigrade (Reverse-Joint) Raptor Legs ──
+    static _buildDigitigradeLegs(pelvisGroup, m, opts = {}) {
       const legs = [];
+      const hipWidth = opts.hipWidth || 0.95;
+      const thighW = opts.thighW || 0.70;
+      const footW = opts.footW || 0.92;
+      const whiteMat = m.whiteComposite || m.lightMetal;
+      const blueArmMat = m.electricBlueArmor || m.armorAccent;
+      const redGlow = m.crimsonGlow || m.energy;
+
       [-1, 1].forEach(side => {
         const hipPivot = new THREE.Group();
-        hipPivot.position.set(side * 0.75, -0.1, 0);
+        hipPivot.position.set(side * hipWidth, -0.12, 0.04);
+        hipPivot.rotation.z = side * 0.14; // Spread wide in combat A-stance
+        hipPivot.rotation.y = side * -0.06;
         pelvisGroup.add(hipPivot);
+
+        // Spherical hip rotary ball joint
+        const hipBall = new THREE.Mesh(new THREE.SphereGeometry(0.34, 16, 16), m.darkMetal);
+        hipPivot.add(hipBall);
 
         const thighGroup = new THREE.Group();
         hipPivot.add(thighGroup);
 
-        // Forward angled thigh
-        const thigh = new THREE.Mesh(new THREE.BoxGeometry(0.55, 1.2, 0.7), m.armor);
-        thigh.position.set(0, -0.5, 0.2);
-        thigh.rotation.x = Math.PI * 0.12;
+        // Forward-canted Upper Thigh (angled forward ~24°)
+        const thighAngle = Math.PI * 0.14;
+        thighGroup.rotation.x = thighAngle;
+
+        // Main Thigh Armor Housing
+        const thigh = new THREE.Mesh(new THREE.BoxGeometry(thighW, 1.32, 0.82), m.armor);
+        thigh.position.set(0, -0.62, 0.05);
+        thigh.castShadow = true;
         thighGroup.add(thigh);
 
-        // Tension tendon cable
-        const tendon = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.1, 6), m.rubber);
-        tendon.position.set(0, -0.5, -0.25);
-        thighGroup.add(tendon);
+        // Signature Glowing Crimson Curved Front Channel (from reference image)
+        const thighGlow = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.96, 0.12), redGlow);
+        thighGlow.position.set(0, -0.60, 0.47);
+        thighGroup.add(thighGlow);
 
+        // Alpine White Composite Outer Flank Armor Chevron
+        const thighWhite = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.68, 0.65), whiteMat);
+        thighWhite.position.set(side * (thighW * 0.5 + 0.05), -0.52, 0.08);
+        thighGroup.add(thighWhite);
+
+        // Rear Chrome Hydraulic Shock Cylinder
+        const thighPiston = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.05, 8), m.hydraulic);
+        thighPiston.position.set(0, -0.62, -0.42);
+        thighGroup.add(thighPiston);
+
+        // ── Reverse Knee Assembly ──
         const kneePivot = new THREE.Group();
-        kneePivot.position.set(0, -1.1, 0.4);
+        kneePivot.position.set(0, -1.28, 0.08);
         thighGroup.add(kneePivot);
 
-        // Backward angled reverse shin
+        // Transverse Knee Pivot Cylinder Hub
+        const kneeHub = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, thighW + 0.08, 16), m.darkMetal);
+        kneeHub.rotation.z = Math.PI / 2;
+        kneeHub.castShadow = true;
+        kneePivot.add(kneeHub);
+
+        // Glowing Crimson Knee Hub Ring on outer face
+        const kneeRing = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.04, 8, 18), redGlow);
+        kneeRing.rotation.y = Math.PI / 2;
+        kneeRing.position.set(side * (thighW * 0.5 + 0.07), 0, 0);
+        kneePivot.add(kneeRing);
+
+        // Forward-Jutting Angular Knee Armor Guard
+        const kneeGuard = new THREE.Mesh(new THREE.BoxGeometry(thighW * 0.92, 0.62, 0.58), m.armor);
+        kneeGuard.position.set(0, 0.12, 0.36);
+        kneeGuard.rotation.x = -Math.PI * 0.14;
+        kneeGuard.castShadow = true;
+        kneePivot.add(kneeGuard);
+
+        // Crisp Alpine White Knee Strike Cap
+        const kneeWhite = new THREE.Mesh(new THREE.BoxGeometry(thighW * 0.72, 0.28, 0.18), whiteMat);
+        kneeWhite.position.set(0, 0.18, 0.64);
+        kneeWhite.rotation.x = -Math.PI * 0.14;
+        kneePivot.add(kneeWhite);
+
+        // ── Backward-Slanted Reverse Shin / Upper Calf ──
         const shinGroup = new THREE.Group();
         kneePivot.add(shinGroup);
 
-        const shin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.3, 0.65), m.armorAccent);
-        shin.position.set(0, -0.6, -0.25);
-        shin.rotation.x = -Math.PI * 0.2;
+        // Reverse angle: slanted backward ~48°
+        const shinAngle = -Math.PI * 0.27;
+        shinGroup.rotation.x = shinAngle;
+
+        // Upper Calf Structural Pylon
+        const shin = new THREE.Mesh(new THREE.BoxGeometry(thighW * 0.88, 1.40, 0.72), m.armorAccent);
+        shin.position.set(0, -0.68, -0.06);
+        shin.castShadow = true;
         shinGroup.add(shin);
 
-        // Hydraulic strut bridging knee and ankle
-        const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.8, 8), m.hydraulic);
-        strut.position.set(0, -0.6, 0.1);
-        shinGroup.add(strut);
+        // Front Chrome Hydraulic Assist Piston Strut
+        const shinPiston = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.08, 8), m.hydraulic);
+        shinPiston.position.set(0, -0.64, 0.36);
+        shinGroup.add(shinPiston);
 
+        // ── Lower Leg / Ankle Sleeve (Metallic Cobalt Blue) ──
         const anklePivot = new THREE.Group();
-        anklePivot.position.set(0, -1.2, -0.5);
+        anklePivot.position.set(0, -1.36, -0.08);
         shinGroup.add(anklePivot);
 
-        // Raptor claw foot
-        const foot = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.28, 1.4), m.armor);
-        foot.position.set(0, -0.14, 0.35);
-        anklePivot.add(foot);
+        // Counter-angle to restore foot horizontal orientation
+        const ankleCounterAngle = -(thighAngle + shinAngle);
+        anklePivot.rotation.x = ankleCounterAngle;
+        anklePivot.rotation.z = side * -0.14; // Counter-roll to keep sole flat on platform
+
+        // High-Specular Metallic Cobalt Blue Lower Shin Plating (from reference image)
+        const blueSleeve = new THREE.Mesh(new THREE.BoxGeometry(thighW * 0.95, 0.88, 0.78), blueArmMat);
+        blueSleeve.position.set(0, -0.38, 0.06);
+        blueSleeve.castShadow = true;
+        anklePivot.add(blueSleeve);
+
+        // Alpine White Lower Shin Front Strike Chevron
+        const blueWhite = new THREE.Mesh(new THREE.BoxGeometry(thighW * 0.65, 0.42, 0.14), whiteMat);
+        blueWhite.position.set(0, -0.32, 0.46);
+        anklePivot.add(blueWhite);
+
+        // Lateral Ankle Hydraulic Actuators
+        [-0.34, 0.34].forEach(ax => {
+          const anklePiston = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.45, 8), m.lightMetal);
+          anklePiston.position.set(ax, -0.36, 0.04);
+          anklePivot.add(anklePiston);
+        });
+
+        // ── Articulated Cybernetic Split-Claw Foot ──
+        const footGroup = new THREE.Group();
+        footGroup.position.set(0, -0.76, 0.08);
+        anklePivot.add(footGroup);
+
+        // Main Foot Chassis
+        const footBase = new THREE.Mesh(new THREE.BoxGeometry(footW * 0.9, 0.30, 1.05), m.darkMetal);
+        footBase.position.set(0, -0.15, 0.08);
+        footBase.castShadow = true;
+        footGroup.add(footBase);
+
+        // Dual Split Front Claws / Mechanical Talons
+        [-0.26, 0.26].forEach(tx => {
+          const toe = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.26, 0.76), m.armor);
+          toe.position.set(tx, -0.16, 0.74);
+          toe.rotation.y = (tx > 0 ? 1 : -1) * 0.12;
+          toe.castShadow = true;
+          footGroup.add(toe);
+
+          // Alpine White Toe Tip Cap
+          const toeCap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.18, 0.22), whiteMat);
+          toeCap.position.set(tx > 0 ? tx + 0.04 : tx - 0.04, -0.14, 1.12);
+          toeCap.rotation.y = (tx > 0 ? 1 : -1) * 0.12;
+          footGroup.add(toeCap);
+        });
+
+        // Rear Heel Recoil Anchor Spur
+        const heelSpur = new THREE.Mesh(new THREE.BoxGeometry(footW * 0.65, 0.26, 0.58), m.darkMetal);
+        heelSpur.position.set(0, -0.15, -0.52);
+        heelSpur.rotation.x = -Math.PI * 0.12;
+        footGroup.add(heelSpur);
+
+        // Rubber Traction Sole Pads
+        const sole = new THREE.Mesh(new THREE.BoxGeometry(footW * 0.88, 0.08, 1.55), m.rubber);
+        sole.position.set(0, -0.28, 0.22);
+        footGroup.add(sole);
 
         legs.push({ hipPivot, thighGroup, kneePivot, shinGroup, anklePivot });
       });
 
       return legs;
+    }
+
+    static getArchetypeConfig(archetypeKey) {
+      const key = (archetypeKey || '').toUpperCase();
+      const configs = {
+        ASSAULT: { role: 'Assault', hp: 500, speed: 16.0, damage: 45, scale: 1.0 },
+        TANK: { role: 'Tank', hp: 850, speed: 11.5, damage: 40, scale: 1.25 },
+        SCOUT: { role: 'Scout', hp: 350, speed: 22.5, damage: 32, scale: 0.85 },
+        STRIKER: { role: 'Striker / Assassin', hp: 420, speed: 18.0, damage: 58, scale: 0.95 }
+      };
+      return configs[key] || configs.ASSAULT;
     }
 
     // Backward compatibility helper

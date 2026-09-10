@@ -23,12 +23,12 @@ window.IT = window.IT || {};
       this.scene.add(this.hangarGroup);
 
       // Inspection state
-      this.yaw = 0.2;
-      this.pitch = 0.12;
-      this.distance = 14.0;
-      this.minDistance = 7.0;
-      this.maxDistance = 24.0;
-      this.targetLookAt = new THREE.Vector3(0, 2.5, 0);
+      this.yaw = 0.05;
+      this.pitch = 0.04;
+      this.distance = 9.6;
+      this.minDistance = 5.0;
+      this.maxDistance = 20.0;
+      this.targetLookAt = new THREE.Vector3(-0.65, 2.25, 0);
 
       // Drag / touch interaction
       this.isDragging = false;
@@ -213,23 +213,28 @@ window.IT = window.IT || {};
       this.hangarGroup.add(keyLight);
 
       // Electric Cyan Rim Light (Left)
-      const rimLightCyan = new THREE.DirectionalLight(0x00f0ff, 1.6);
+      const rimLightCyan = new THREE.DirectionalLight(0x00f0ff, 0.75);
       rimLightCyan.position.set(-15, 12, -8);
       this.hangarGroup.add(rimLightCyan);
 
       // Warm Amber Accent Rim Light (Right)
-      const rimLightAmber = new THREE.DirectionalLight(0xff6622, 1.0);
+      const rimLightAmber = new THREE.DirectionalLight(0xff6622, 0.75);
       rimLightAmber.position.set(16, 10, -8);
       this.hangarGroup.add(rimLightAmber);
 
-      // Ground Turntable Uplight
-      const platformUplight = new THREE.PointLight(0x00c8ff, 2.2, 12);
+      // Ground Turntable Uplight (Subtle soft fill from floor)
+      const platformUplight = new THREE.PointLight(0x00c8ff, 1.2, 12);
       platformUplight.position.set(0, 0.8, 0);
       this.hangarGroup.add(platformUplight);
 
       // Ambient Floor Fill Light
       const ambientFloor = new THREE.HemisphereLight(0x1a2b4c, 0x050810, 1.1);
       this.hangarGroup.add(ambientFloor);
+
+      // Hero Character Front Key Light
+      const heroKey = new THREE.DirectionalLight(0xffffff, 0.75);
+      heroKey.position.set(0, 5, 12);
+      this.hangarGroup.add(heroKey);
     }
 
     _setupInputListeners() {
@@ -313,8 +318,10 @@ window.IT = window.IT || {};
 
     show() {
       this.hangarGroup.visible = true;
-      this.distance = 13.5;
-      this.targetLookAt.set(0, 2.5, 0);
+      this.distance = 9.6;
+      this.targetLookAt.set(-0.65, 2.25, 0);
+      this.yaw = 0.05;
+      this.pitch = 0.04;
     }
 
     hide() {
@@ -340,9 +347,12 @@ window.IT = window.IT || {};
         secondaryWeapon: secondaryWeaponId
       });
 
-      this.currentMechRig.root.position.set(0, 0.6, 0);
+      this.currentMechRig.root.position.set(0, 0.1, 0);
       this.hangarGroup.add(this.currentMechRig.root);
-      this.targetLookAt.set(0, 2.7, 0);
+      this.targetLookAt.set(-0.65, 2.25, 0);
+      this.distance = 9.6;
+      this.yaw = 0.05;
+      this.pitch = 0.04;
     }
 
     /**
@@ -373,28 +383,29 @@ window.IT = window.IT || {};
 
       // Gentle auto-rotation when user is not dragging
       if (!this.isDragging) {
-        this.yaw += dt * 0.18;
+        this.yaw += dt * 0.08;
       }
 
       // Rotate turntable platform slowly
       if (this.turntable) {
-        this.turntable.rotation.y += dt * 0.12;
+        this.turntable.rotation.y += dt * 0.06;
       }
 
       // ── Idle Breathing Animation on Mech ──
       if (this.currentMechRig) {
-        const breath = Math.sin(this.animTime * 2.0) * 0.04;
-        this.currentMechRig.pelvisGroup.position.y = 2.6 + breath;
+        const breath = Math.sin(this.animTime * 2.0) * 0.03;
+        this.currentMechRig.pelvisGroup.position.y = 2.68 + breath;
 
-        // Gentle arm sway
+        // Gentle arm sway while preserving raised combat-ready strike posture
         if (this.currentMechRig.arms && this.currentMechRig.arms.length >= 2) {
-          this.currentMechRig.arms[0].rotation.x = Math.sin(this.animTime * 1.5) * 0.03;
-          this.currentMechRig.arms[1].rotation.x = -Math.sin(this.animTime * 1.5) * 0.03;
+          const baseArmX = -0.26;
+          this.currentMechRig.arms[0].rotation.x = baseArmX + Math.sin(this.animTime * 1.5) * 0.02;
+          this.currentMechRig.arms[1].rotation.x = baseArmX - Math.sin(this.animTime * 1.5) * 0.02;
         }
 
         // Reactor glow pulse
         if (this.currentMechRig.materials && this.currentMechRig.materials.energy) {
-          this.currentMechRig.materials.energy.emissiveIntensity = 2.0 + Math.sin(this.animTime * 3.0) * 0.6;
+          this.currentMechRig.materials.energy.emissiveIntensity = 2.4 + Math.sin(this.animTime * 3.0) * 0.5;
         }
       }
 

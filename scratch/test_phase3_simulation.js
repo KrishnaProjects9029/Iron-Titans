@@ -71,7 +71,7 @@ const THREE = {
     lerp(v,alpha){this.x+=(v.x-this.x)*alpha;this.y+=(v.y-this.y)*alpha;this.z+=(v.z-this.z)*alpha;return this;}
   },
   Group: class {
-    constructor(){this.position=new THREE.Vector3();this.rotation={x:0,y:0,z:0};this.scale=new THREE.Vector3(1,1,1);this.children=[];}
+    constructor(){this.position=new THREE.Vector3();this.rotation={x:0,y:0,z:0};this.quaternion={setFromUnitVectors:()=>{}};this.scale=new THREE.Vector3(1,1,1);this.children=[];}
     add(child){this.children.push(child);child.parent=this;}
     remove(child){const idx=this.children.indexOf(child);if(idx>=0)this.children.splice(idx,1);}
   },
@@ -84,10 +84,16 @@ const THREE = {
   CanvasTexture: class { constructor(){this.needsUpdate=false;} },
   MeshStandardMaterial: class { constructor(opts={}){this.color=opts.color;this.emissive={setHex:()=>{}};this.emissiveIntensity=opts.emissiveIntensity||0;} },
   MeshBasicMaterial: class { constructor(opts={}){this.color=opts.color;} },
+  LineBasicMaterial: class { constructor(opts={}){this.color=opts.color;} },
+  Line: class { constructor(){this.geometry={setFromPoints:()=>{}};this.position=new THREE.Vector3();} },
+  BufferGeometry: class { constructor(){this.setFromPoints=()=>{};this.attributes={};} setAttribute(name,attr){this.attributes[name]=attr;} getAttribute(name){return this.attributes[name] || {setXYZ:()=>{}}; } },
+  BufferAttribute: class { constructor(arr, size){this.array=arr;this.itemSize=size;this.needsUpdate=false;} setXYZ(){} },
   BoxGeometry: class {},
   CylinderGeometry: class {},
+  ConeGeometry: class {},
   SphereGeometry: class {},
   PlaneGeometry: class {},
+  TorusGeometry: class {},
   PointLight: class { constructor(){this.position=new THREE.Vector3();} },
   Object3D: class {
     constructor(){this.position=new THREE.Vector3();}
@@ -95,6 +101,7 @@ const THREE = {
   },
   Raycaster: class {
     constructor(orig,dir,n,f){this.origin=orig;this.direction=dir;this.near=n;this.far=f;}
+    set(orig,dir){this.origin=orig;this.direction=dir;}
     setFromCamera(){}
     intersectObjects(){return [];}
   }
@@ -102,6 +109,10 @@ const THREE = {
 global.THREE = THREE;
 
 // Load Iron Titans modules
+require('../js/data/MechRegistry.js');
+require('../js/data/WeaponRegistry.js');
+require('../js/3d/MaterialSystem.js');
+require('../js/3d/WeaponBuilder3D.js');
 require('../js/3d/TeamManager.js');
 require('../js/3d/MechBuilder3D.js');
 require('../js/3d/Mech3D.js');

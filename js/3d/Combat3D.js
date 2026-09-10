@@ -74,9 +74,10 @@ window.IT = window.IT || {};
 
   // ── Unified Projectile Entity with Sleek Velocity Ribbon Trails ──
   class Projectile3D {
-    constructor(scene, type = 'PULSE') {
+    constructor(scene, type = 'PULSE', targetPos = null, options = {}) {
       this.scene = scene;
-      this.type = type;
+      const isLegacy = type && (type.isVector3 || typeof type.x === 'number');
+      this.type = isLegacy ? (options.type || 'PULSE') : (type || 'PULSE');
       this.sourceMech = null;
       this.team = 'blue';
       this.damage = 45;
@@ -148,6 +149,10 @@ window.IT = window.IT || {};
       if (this.scene) {
         this.scene.add(this.mesh);
         this.scene.add(this.trailLine);
+      }
+
+      if (isLegacy && targetPos) {
+        this.init(type, targetPos, options);
       }
     }
 
