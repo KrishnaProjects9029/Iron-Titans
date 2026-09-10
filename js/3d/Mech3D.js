@@ -305,24 +305,72 @@ window.IT = window.IT || {};
       }
 
       if (hasInput) {
-        const moveDir = new THREE.Vector3(moveInput.x, 0, moveInput.z).normalize();
-        const targetHeading = Math.atan2(moveDir.x, moveDir.z);
-        let diff = targetHeading - this.heading;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        while (diff > Math.PI) diff -= Math.PI * 2;
-        this.heading += diff * Math.min(1.0, this.turnSpeed * dt);
-        this.mesh.rotation.y = this.heading;
+        const inputLen = Math.hypot(moveInput.x, moveInput.z);
+        const inputDirX = moveInput.x / (inputLen || 1);
+        const inputDirZ = moveInput.z / (inputLen || 1);
+        const forwardSpd = currentSpeed * Math.min(1.0, inputLen);
 
-        const forwardSpd = currentSpeed * Math.min(1.0, moveDir.length());
-        this.velocity.x = Math.sin(this.heading) * forwardSpd;
-        this.velocity.z = Math.cos(this.heading) * forwardSpd;
+        if (this.isPlayer) {
+          // Player responsive movement: velocity directly follows camera-relative input
+          this.velocity.x = inputDirX * forwardSpd;
+          this.velocity.z = inputDirZ * forwardSpd;
 
-        this.prevWalkPhase = this.walkPhase;
-        this.walkPhase += dt * forwardSpd * 0.9;
+          // Player mech chassis smoothly aligns with the crosshair / aim point
+          let desiredHeading = this.heading;
+          if (aimTargetPoint) {
+            const dx = aimTargetPoint.x - this.position.x;
+            const dz = aimTargetPoint.z - this.position.z;
+            if (Math.hypot(dx, dz) > 0.5) {
+              desiredHeading = Math.atan2(dx, dz);
+            }
+          } else {
+            desiredHeading = Math.atan2(inputDirX, inputDirZ);
+          }
+
+          let diff = desiredHeading - this.heading;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          this.heading += diff * Math.min(1.0, 12.0 * dt);
+          this.mesh.rotation.y = this.heading;
+
+          // Leg walk phase: forward vs reverse walking
+          const fwdX = Math.sin(this.heading);
+          const fwdZ = Math.cos(this.heading);
+          const fwdDot = (this.velocity.x * fwdX + this.velocity.z * fwdZ);
+          this.prevWalkPhase = this.walkPhase;
+          this.walkPhase += (fwdDot >= 0 ? 1 : -1) * dt * forwardSpd * 0.9;
+        } else {
+          // AI bot kinematics
+          const targetHeading = Math.atan2(inputDirX, inputDirZ);
+          let diff = targetHeading - this.heading;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          this.heading += diff * Math.min(1.0, this.turnSpeed * dt);
+          this.mesh.rotation.y = this.heading;
+
+          this.velocity.x = Math.sin(this.heading) * forwardSpd;
+          this.velocity.z = Math.cos(this.heading) * forwardSpd;
+
+          this.prevWalkPhase = this.walkPhase;
+          this.walkPhase += dt * forwardSpd * 0.9;
+        }
       } else {
         this.velocity.x *= Math.exp(-dt * 12);
         this.velocity.z *= Math.exp(-dt * 12);
         this.walkPhase *= Math.exp(-dt * 4);
+
+        if (this.isPlayer && aimTargetPoint) {
+          const dx = aimTargetPoint.x - this.position.x;
+          const dz = aimTargetPoint.z - this.position.z;
+          if (Math.hypot(dx, dz) > 0.5) {
+            const desiredHeading = Math.atan2(dx, dz);
+            let diff = desiredHeading - this.heading;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            this.heading += diff * Math.min(1.0, 12.0 * dt);
+            this.mesh.rotation.y = this.heading;
+          }
+        }
       }
 
       // Collision resolution

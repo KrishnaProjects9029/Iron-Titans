@@ -168,17 +168,28 @@ window.IT = window.IT || {};
           if (this.joystickTouchId === null) {
             this.joystickTouchId = touch.identifier;
 
-            // Recenter base to finger position if desired, or use base center
+            // Anchor center directly to touchdown point (true dynamic floating joystick)
+            this.joystickCenter.x = tx;
+            this.joystickCenter.y = ty;
+
             if (this.baseEl) {
-              const rect = this.baseEl.getBoundingClientRect();
-              this.joystickCenter.x = rect.left + rect.width / 2;
-              this.joystickCenter.y = rect.top + rect.height / 2;
-            } else {
-              this.joystickCenter.x = tx;
-              this.joystickCenter.y = ty;
+              this.baseEl.style.position = 'fixed';
+              this.baseEl.style.left = `${tx - 55}px`;
+              this.baseEl.style.top = `${ty - 55}px`;
+              this.baseEl.style.bottom = 'auto';
+              this.baseEl.style.right = 'auto';
+              this.baseEl.style.opacity = '1.0';
+              this.baseEl.style.transition = 'none';
             }
 
-            this._updateJoystickFromPoint(tx, ty);
+            if (this.knobEl) {
+              this.knobEl.style.transform = 'translate(0px, 0px)';
+              this.knobEl.style.transition = 'none';
+            }
+
+            this.moveVector.x = 0;
+            this.moveVector.y = 0;
+            e.preventDefault();
           }
         }
         // Right Zone: Camera Aiming Look-Zone (Right 58% of screen)
@@ -187,6 +198,7 @@ window.IT = window.IT || {};
             this.lookTouchId = touch.identifier;
             this.lookLastPos.x = tx;
             this.lookLastPos.y = ty;
+            e.preventDefault();
           }
         }
       }
@@ -199,6 +211,7 @@ window.IT = window.IT || {};
         // 1. Update Joystick
         if (touch.identifier === this.joystickTouchId) {
           this._updateJoystickFromPoint(touch.clientX, touch.clientY);
+          e.preventDefault();
         }
         // 2. Update Camera Look Delta
         else if (touch.identifier === this.lookTouchId) {
@@ -210,6 +223,7 @@ window.IT = window.IT || {};
 
           this.lookLastPos.x = touch.clientX;
           this.lookLastPos.y = touch.clientY;
+          e.preventDefault();
         }
       }
     }
@@ -226,10 +240,20 @@ window.IT = window.IT || {};
           if (this.knobEl) {
             this.knobEl.style.transform = 'translate(0px, 0px)';
           }
+          if (this.baseEl) {
+            this.baseEl.style.position = '';
+            this.baseEl.style.left = '';
+            this.baseEl.style.top = '';
+            this.baseEl.style.bottom = '';
+            this.baseEl.style.right = '';
+            this.baseEl.style.opacity = '';
+          }
+          e.preventDefault();
         }
         // Release Camera Look
         else if (touch.identifier === this.lookTouchId) {
           this.lookTouchId = null;
+          e.preventDefault();
         }
       }
     }

@@ -28,7 +28,7 @@ window.IT = window.IT || {};
       this.target = targetMech;
 
       // Spherical orbital coordinates
-      this.yaw = 0;
+      this.yaw = (targetMech && typeof targetMech.heading === 'number') ? targetMech.heading : 0;
       this.pitch = 0.22;
       this.distance = 12.5;
       this.targetDistance = 12.5;
@@ -105,7 +105,7 @@ window.IT = window.IT || {};
     }
 
     rotate(deltaX, deltaY) {
-      this.yaw -= deltaX * this.sensitivityX;
+      this.yaw += deltaX * this.sensitivityX;
       this.pitch += deltaY * this.sensitivityY;
       this.pitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
     }
