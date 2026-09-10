@@ -81,9 +81,21 @@ window.IT = window.IT || {};
       // 6. Setup Controls & Leave Battle Button
       this._setupControlsUI();
 
-      // 7. Start Master Render Loop
-      this._animate = () => this.loop();
+      // 7. Start Master Render Loop (with headless / background fallback ticker)
+      this._lastLoopTime = performance.now();
+      this._animate = () => {
+        this._lastLoopTime = performance.now();
+        this.loop();
+      };
       requestAnimationFrame(this._animate);
+
+      const checkHeartbeat = () => {
+        if (performance.now() - this._lastLoopTime > 32) {
+          this._animate();
+        }
+        setTimeout(checkHeartbeat, 16);
+      };
+      setTimeout(checkHeartbeat, 50);
     }
 
     _wireMatchEvents() {
@@ -583,6 +595,7 @@ window.IT = window.IT || {};
     }
 
     loop() {
+      this._lastLoopTime = performance.now();
       requestAnimationFrame(this._animate);
 
       try {

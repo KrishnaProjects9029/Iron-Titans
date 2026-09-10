@@ -21,7 +21,8 @@ window.IT = window.IT || {};
         this.renderer = new THREE.WebGLRenderer({
           canvas: this.canvas,
           antialias: true,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
+          preserveDrawingBuffer: true
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
