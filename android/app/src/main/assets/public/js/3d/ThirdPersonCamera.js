@@ -213,7 +213,7 @@ window.IT = window.IT || {};
     }
 
     getRightDirection() {
-      return _camRight.set(Math.cos(this.yaw), 0, -Math.sin(this.yaw)).normalize();
+      return _camRight.set(-Math.cos(this.yaw), 0, Math.sin(this.yaw)).normalize();
     }
   }
 
